@@ -1,0 +1,20 @@
+{
+  "name": "pos-los-pachecos-backend",
+  "version": "0.1.0",
+  "description": "Backend base para POS Los Pachecos",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "keywords": [
+    "pos",
+    "taqueria",
+    "express"
+  ],
+  "author": "Equipo Los Pachecos",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

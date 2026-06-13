@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>POS Los Pachecos</title>
+    <style>
+      :root {
+        --brand-primary: #b22222;
+        --brand-dark: #2f1b12;
+        --brand-accent: #ffcc66;
+        --surface: #fff8f0;
+        --text-main: #2a201c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(circle at top, #ffe8cc, #fff8f0 55%);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .card {
+        width: min(760px, 100%);
+        background: #ffffff;
+        border: 1px solid #f1d8c2;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 12px 30px rgba(80, 35, 20, 0.15);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        color: var(--brand-primary);
+      }
+
+      p {
+        margin: 0 0 12px;
+        line-height: 1.6;
+      }
+
+      .badge {
+        display: inline-block;
+        background: var(--brand-dark);
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+      }
+
+      ul {
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <span class="badge">Semana 4 · Onboarding</span>
+      <h1>POS Los Pachecos</h1>
+      <p>
+        Este frontend representa la base inicial del Punto de Venta para la
+        taqueria Los Pachecos.
+      </p>
+      <p>
+        Objetivo inmediato: preparar la interfaz para captura de ordenes,
+        visualizacion de catalogo y telemetria operativa.
+      </p>
+
+      <ul>
+        <li>Estado del modulo: inicializado.</li>
+        <li>Siguiente hito: pantalla de login y catalogo visual.</li>
+        <li>Backend esperado en: <strong>http://localhost:3000</strong>.</li>
+      </ul>
+    </main>
+
+    <script>
+      // Mensaje simple para confirmar carga del esqueleto frontend.
+      console.log('Frontend base de POS Los Pachecos cargado.');
+    </script>
+  </body>
+</html>
