@@ -9,6 +9,14 @@ Sistema de Punto de Venta (POS) para la taqueria **Los Pachecos**, disenado para
 - Publicar una pantalla inicial de frontend.
 - Establecer base para trazabilidad de eventos y tiempos de procesamiento.
 
+## Avance actual (Semana 5 - base funcional)
+
+- Autenticacion inicial por usuario y PIN en backend.
+- Catalogo visual consumido desde API.
+- Creacion de ordenes con calculo de total.
+- Envio de orden a cocina y actualizacion de estados.
+- Registro de eventos de telemetria y resumen de metricas.
+
 ## Stack Tecnologico (Base propuesta)
 
 - **Frontend:** HTML5, CSS3 y JavaScript Vanilla
@@ -71,6 +79,8 @@ pos-los-pachecos/
 
 ## Primeros pasos locales
 
+Prerequisito: tener instalado Node.js LTS (incluye npm).
+
 ### Backend
 
 ```bash
@@ -83,7 +93,24 @@ Servidor esperado en: `http://localhost:3000`
 
 ### Frontend
 
-Abre `frontend/index.html` en navegador para visualizar la pantalla inicial.
+Abre `frontend/index.html` en navegador para visualizar la aplicacion base.
+
+## Credenciales demo
+
+- Usuario: `cajero1` | PIN: `1234`
+- Usuario: `admin1` | PIN: `4321`
+
+## Endpoints disponibles (base)
+
+- `GET /health`
+- `POST /api/auth/login`
+- `GET /api/catalog/products`
+- `GET /api/orders`
+- `POST /api/orders`
+- `POST /api/orders/:id/send-kitchen`
+- `PATCH /api/orders/:id/status`
+- `GET /api/telemetry/events`
+- `GET /api/telemetry/summary`
 
 ## Convenciones sugeridas para el equipo
 

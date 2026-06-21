@@ -4,13 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>POS Los Pachecos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
-        --brand-primary: #b22222;
-        --brand-dark: #2f1b12;
-        --brand-accent: #ffcc66;
-        --surface: #fff8f0;
-        --text-main: #2a201c;
+        --tomato: #cf3f2f;
+        --chipotle: #29140f;
+        --maize: #f5b73b;
+        --cream: #fff6ea;
+        --smoke: #3f312c;
+        --card: #ffffff;
+        --ok: #1f8a52;
       }
 
       * {
@@ -19,71 +27,504 @@
 
       body {
         margin: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: radial-gradient(circle at top, #ffe8cc, #fff8f0 55%);
-        color: var(--text-main);
+        font-family: "Space Grotesk", sans-serif;
+        color: var(--smoke);
+        background:
+          radial-gradient(circle at 0% 0%, #ffd28f 0%, transparent 42%),
+          radial-gradient(circle at 100% 0%, #ffad7e 0%, transparent 38%),
+          linear-gradient(160deg, #fff9ef 0%, #ffe8ce 48%, #fdd4b6 100%);
         min-height: 100vh;
-        display: grid;
-        place-items: center;
+      }
+
+      .layout {
+        width: min(1200px, 100%);
+        margin: 0 auto;
         padding: 24px;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr;
       }
 
-      .card {
-        width: min(760px, 100%);
-        background: #ffffff;
-        border: 1px solid #f1d8c2;
-        border-radius: 16px;
-        padding: 28px;
-        box-shadow: 0 12px 30px rgba(80, 35, 20, 0.15);
-      }
-
-      h1 {
-        margin: 0 0 8px;
-        color: var(--brand-primary);
-      }
-
-      p {
-        margin: 0 0 12px;
-        line-height: 1.6;
-      }
-
-      .badge {
-        display: inline-block;
-        background: var(--brand-dark);
+      .headline {
+        background: var(--chipotle);
         color: #fff;
-        padding: 6px 10px;
-        border-radius: 999px;
-        font-size: 0.85rem;
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: 0 10px 24px rgba(41, 20, 15, 0.35);
+        animation: riseIn 0.6s ease;
       }
 
-      ul {
-        margin-top: 16px;
+      .headline h1 {
+        margin: 0;
+        font-family: "Bebas Neue", sans-serif;
+        letter-spacing: 1px;
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: var(--maize);
+      }
+
+      .headline p {
+        margin: 6px 0 0;
+      }
+
+      .main-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        background: var(--card);
+        border-radius: 18px;
+        border: 1px solid #f5d8c0;
+        padding: 18px;
+        box-shadow: 0 10px 26px rgba(82, 37, 20, 0.12);
+      }
+
+      .panel h2 {
+        margin: 0 0 12px;
+        font-size: 1.1rem;
+      }
+
+      .panel-row {
+        display: grid;
+        gap: 10px;
+      }
+
+      label {
+        font-size: 0.88rem;
+        font-weight: 600;
+      }
+
+      input,
+      button,
+      select {
+        font-family: inherit;
+        font-size: 0.95rem;
+      }
+
+      input,
+      select {
+        width: 100%;
+        border: 1px solid #e7c9b0;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        background: var(--tomato);
+        color: #fff;
+        font-weight: 700;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(207, 63, 47, 0.3);
+      }
+
+      button.secondary {
+        background: #fff;
+        color: var(--chipotle);
+        border: 1px solid #d6b39a;
+      }
+
+      .status {
+        margin-top: 8px;
+        font-size: 0.9rem;
+      }
+
+      .status.ok {
+        color: var(--ok);
+      }
+
+      .status.error {
+        color: #b02b2b;
+      }
+
+      .catalog {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+
+      .product {
+        border: 1px solid #f0d8c5;
+        border-radius: 12px;
+        padding: 12px;
+        background: #fffcf8;
+        animation: riseIn 0.45s ease;
+      }
+
+      .product h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+
+      .chips {
+        display: inline-block;
+        background: #ffe4bf;
+        color: #7a4b16;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 0.8rem;
+      }
+
+      .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .cart-table th,
+      .cart-table td {
+        padding: 8px;
+        border-bottom: 1px solid #f2dfcf;
+        text-align: left;
+        font-size: 0.9rem;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .kpi {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 8px;
+      }
+
+      .kpi-item {
+        border: 1px solid #ecd4c0;
+        border-radius: 12px;
+        background: #fffdfa;
+        padding: 10px;
+      }
+
+      .kpi-item strong {
+        display: block;
+        font-size: 1.25rem;
+      }
+
+      @media (min-width: 980px) {
+        .main-grid {
+          grid-template-columns: 1.2fr 1fr;
+        }
+      }
+
+      @keyframes riseIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
     </style>
   </head>
   <body>
-    <main class="card">
-      <span class="badge">Semana 4 · Onboarding</span>
-      <h1>POS Los Pachecos</h1>
-      <p>
-        Este frontend representa la base inicial del Punto de Venta para la
-        taqueria Los Pachecos.
-      </p>
-      <p>
-        Objetivo inmediato: preparar la interfaz para captura de ordenes,
-        visualizacion de catalogo y telemetria operativa.
-      </p>
+    <div class="layout">
+      <header class="headline">
+        <h1>POS LOS PACHECOS</h1>
+        <p>Semana 5: autenticacion, catalogo, ordenes y telemetria operativa.</p>
+      </header>
 
-      <ul>
-        <li>Estado del modulo: inicializado.</li>
-        <li>Siguiente hito: pantalla de login y catalogo visual.</li>
-        <li>Backend esperado en: <strong>http://localhost:3000</strong>.</li>
-      </ul>
-    </main>
+      <div class="main-grid">
+        <section class="panel panel-row">
+          <h2>Acceso del personal</h2>
+          <label for="username">Usuario</label>
+          <input id="username" type="text" placeholder="Ejemplo: cajero1" />
+
+          <label for="pin">PIN</label>
+          <input id="pin" type="password" placeholder="Ejemplo: 1234" />
+
+          <button id="loginBtn">Iniciar sesion</button>
+          <div id="authStatus" class="status">Sin autenticar.</div>
+
+          <h2>Catalogo visual</h2>
+          <div id="catalog" class="catalog"></div>
+        </section>
+
+        <section class="panel panel-row">
+          <h2>Orden actual</h2>
+          <table class="cart-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cant.</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="cartBody"></tbody>
+          </table>
+          <p><strong>Total:</strong> $<span id="cartTotal">0</span></p>
+
+          <div class="actions">
+            <button id="createOrderBtn">Crear orden</button>
+            <button id="sendKitchenBtn" class="secondary">Enviar a cocina</button>
+            <button id="readyBtn" class="secondary">Marcar lista</button>
+            <button id="deliverBtn" class="secondary">Marcar entregada</button>
+          </div>
+          <div id="orderStatus" class="status">No hay orden activa.</div>
+
+          <h2>Telemetria</h2>
+          <div class="kpi">
+            <div class="kpi-item">
+              <span>Ordenes</span>
+              <strong id="kpiOrders">0</strong>
+            </div>
+            <div class="kpi-item">
+              <span>Entregadas</span>
+              <strong id="kpiDelivered">0</strong>
+            </div>
+            <div class="kpi-item">
+              <span>Eventos</span>
+              <strong id="kpiEvents">0</strong>
+            </div>
+            <div class="kpi-item">
+              <span>Tiempo prom.</span>
+              <strong><span id="kpiAvg">0</span>s</strong>
+            </div>
+          </div>
+          <button id="refreshTelemetryBtn" class="secondary">Actualizar metricas</button>
+        </section>
+      </div>
+    </div>
 
     <script>
-      // Mensaje simple para confirmar carga del esqueleto frontend.
-      console.log('Frontend base de POS Los Pachecos cargado.');
+      const API_URL = 'http://localhost:3000';
+      const state = {
+        token: null,
+        user: null,
+        products: [],
+        cart: [],
+        lastOrderId: null,
+      };
+
+      const refs = {
+        username: document.getElementById('username'),
+        pin: document.getElementById('pin'),
+        loginBtn: document.getElementById('loginBtn'),
+        authStatus: document.getElementById('authStatus'),
+        catalog: document.getElementById('catalog'),
+        cartBody: document.getElementById('cartBody'),
+        cartTotal: document.getElementById('cartTotal'),
+        createOrderBtn: document.getElementById('createOrderBtn'),
+        sendKitchenBtn: document.getElementById('sendKitchenBtn'),
+        readyBtn: document.getElementById('readyBtn'),
+        deliverBtn: document.getElementById('deliverBtn'),
+        orderStatus: document.getElementById('orderStatus'),
+        kpiOrders: document.getElementById('kpiOrders'),
+        kpiDelivered: document.getElementById('kpiDelivered'),
+        kpiEvents: document.getElementById('kpiEvents'),
+        kpiAvg: document.getElementById('kpiAvg'),
+        refreshTelemetryBtn: document.getElementById('refreshTelemetryBtn'),
+      };
+
+      function setStatus(element, message, isError = false) {
+        element.textContent = message;
+        element.classList.toggle('error', isError);
+        element.classList.toggle('ok', !isError);
+      }
+
+      function renderCatalog() {
+        refs.catalog.innerHTML = '';
+        state.products.forEach((product) => {
+          const card = document.createElement('article');
+          card.className = 'product';
+          card.innerHTML = `
+            <h3>${product.name}</h3>
+            <span class="chips">${product.category}</span>
+            <p><strong>$${product.price}</strong></p>
+            <button data-id="${product.id}">Agregar</button>
+          `;
+
+          card.querySelector('button').addEventListener('click', () => addToCart(product.id));
+          refs.catalog.appendChild(card);
+        });
+      }
+
+      function addToCart(productId) {
+        const product = state.products.find((item) => item.id === productId);
+        if (!product) {
+          return;
+        }
+
+        const existing = state.cart.find((item) => item.productId === productId);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          state.cart.push({ productId: product.id, name: product.name, price: product.price, quantity: 1 });
+        }
+
+        renderCart();
+      }
+
+      function removeFromCart(productId) {
+        state.cart = state.cart.filter((item) => item.productId !== productId);
+        renderCart();
+      }
+
+      function renderCart() {
+        refs.cartBody.innerHTML = '';
+        let total = 0;
+
+        state.cart.forEach((item) => {
+          const subtotal = item.price * item.quantity;
+          total += subtotal;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>$${subtotal}</td>
+            <td><button class="secondary" data-remove="${item.productId}">Quitar</button></td>
+          `;
+          row.querySelector('button').addEventListener('click', () => removeFromCart(item.productId));
+          refs.cartBody.appendChild(row);
+        });
+
+        refs.cartTotal.textContent = String(total);
+      }
+
+      async function loadProducts() {
+        const response = await fetch(`${API_URL}/api/catalog/products`);
+        const data = await response.json();
+        state.products = data.products || [];
+        renderCatalog();
+      }
+
+      async function login() {
+        const username = refs.username.value.trim();
+        const pin = refs.pin.value.trim();
+
+        try {
+          const response = await fetch(`${API_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, pin }),
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            setStatus(refs.authStatus, data.message || 'Error de autenticacion.', true);
+            return;
+          }
+
+          state.token = data.token;
+          state.user = data.user;
+          setStatus(refs.authStatus, `Sesion activa: ${data.user.name} (${data.user.role})`);
+        } catch (error) {
+          setStatus(refs.authStatus, 'No fue posible conectar con el backend.', true);
+        }
+      }
+
+      async function createOrder() {
+        if (!state.user) {
+          setStatus(refs.orderStatus, 'Debes iniciar sesion para crear una orden.', true);
+          return;
+        }
+
+        if (!state.cart.length) {
+          setStatus(refs.orderStatus, 'Agrega al menos un producto a la orden.', true);
+          return;
+        }
+
+        try {
+          const items = state.cart.map((item) => ({ productId: item.productId, quantity: item.quantity }));
+          const response = await fetch(`${API_URL}/api/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items, createdBy: state.user.username }),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.orderStatus, data.message || 'No fue posible crear la orden.', true);
+            return;
+          }
+
+          state.lastOrderId = data.order.id;
+          state.cart = [];
+          renderCart();
+          setStatus(refs.orderStatus, `Orden #${data.order.id} creada con exito.`);
+          await refreshTelemetry();
+        } catch (error) {
+          setStatus(refs.orderStatus, 'Error de comunicacion con backend.', true);
+        }
+      }
+
+      async function updateOrderStage(action) {
+        if (!state.lastOrderId) {
+          setStatus(refs.orderStatus, 'Primero crea una orden para continuar.', true);
+          return;
+        }
+
+        try {
+          let url = `${API_URL}/api/orders/${state.lastOrderId}/send-kitchen`;
+          let method = 'POST';
+          let body;
+
+          if (action === 'lista' || action === 'entregada') {
+            url = `${API_URL}/api/orders/${state.lastOrderId}/status`;
+            method = 'PATCH';
+            body = JSON.stringify({ status: action });
+          }
+
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body,
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            setStatus(refs.orderStatus, data.message || 'No se pudo actualizar la orden.', true);
+            return;
+          }
+
+          setStatus(refs.orderStatus, `Orden #${data.order.id} en estado: ${data.order.status}`);
+          await refreshTelemetry();
+        } catch (error) {
+          setStatus(refs.orderStatus, 'Error al actualizar estado de orden.', true);
+        }
+      }
+
+      async function refreshTelemetry() {
+        try {
+          const response = await fetch(`${API_URL}/api/telemetry/summary`);
+          const data = await response.json();
+
+          refs.kpiOrders.textContent = String(data.totals.orders || 0);
+          refs.kpiDelivered.textContent = String(data.totals.delivered || 0);
+          refs.kpiEvents.textContent = String(data.totals.telemetryEvents || 0);
+          refs.kpiAvg.textContent = String(data.avgProcessingSeconds || 0);
+        } catch (error) {
+          refs.kpiOrders.textContent = '-';
+          refs.kpiDelivered.textContent = '-';
+          refs.kpiEvents.textContent = '-';
+          refs.kpiAvg.textContent = '-';
+        }
+      }
+
+      refs.loginBtn.addEventListener('click', login);
+      refs.createOrderBtn.addEventListener('click', createOrder);
+      refs.sendKitchenBtn.addEventListener('click', () => updateOrderStage('send'));
+      refs.readyBtn.addEventListener('click', () => updateOrderStage('lista'));
+      refs.deliverBtn.addEventListener('click', () => updateOrderStage('entregada'));
+      refs.refreshTelemetryBtn.addEventListener('click', refreshTelemetry);
+
+      Promise.all([loadProducts(), refreshTelemetry()]).catch(() => {
+        setStatus(refs.authStatus, 'Backend no disponible. Inicia el servidor en puerto 3000.', true);
+      });
     </script>
   </body>
 </html>
