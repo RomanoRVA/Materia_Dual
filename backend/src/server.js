@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 
 const app = express();
@@ -19,6 +21,9 @@ const orders = [];
 const telemetryEvents = [];
 let orderSequence = 1;
 
+const logsDir = path.join(__dirname, '..', 'logs');
+const telemetryLogFile = path.join(logsDir, 'telemetry-events.jsonl');
+
 // Middleware base para recibir JSON en futuras rutas del POS.
 app.use(express.json());
 
@@ -36,13 +41,49 @@ app.use((req, res, next) => {
 });
 
 function recordTelemetry(orderId, eventType, metadata = {}) {
-  telemetryEvents.push({
+  const event = {
     id: telemetryEvents.length + 1,
     orderId,
     eventType,
     metadata,
     timestamp: new Date().toISOString(),
-  });
+  };
+
+  telemetryEvents.push(event);
+
+  try {
+    fs.appendFileSync(telemetryLogFile, `${JSON.stringify(event)}\n`, 'utf8');
+  } catch (error) {
+    console.error('[telemetry] No fue posible escribir evento en disco:', error.message);
+  }
+}
+
+function ensureLogsStorage() {
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+  }
+}
+
+function loadTelemetryFromDisk() {
+  if (!fs.existsSync(telemetryLogFile)) {
+    return;
+  }
+
+  const content = fs.readFileSync(telemetryLogFile, 'utf8').trim();
+  if (!content) {
+    return;
+  }
+
+  const lines = content.split('\n');
+
+  for (const line of lines) {
+    try {
+      const event = JSON.parse(line);
+      telemetryEvents.push(event);
+    } catch (error) {
+      console.warn('[telemetry] Linea invalida ignorada en telemetry-events.jsonl');
+    }
+  }
 }
 
 function findOrder(orderId) {
@@ -241,5 +282,7 @@ app.get('/api/telemetry/summary', (req, res) => {
 });
 
 app.listen(PORT, () => {
+  ensureLogsStorage();
+  loadTelemetryFromDisk();
   console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
 });

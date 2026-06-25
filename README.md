@@ -112,6 +112,13 @@ Abre `frontend/index.html` en navegador para visualizar la aplicacion base.
 - `GET /api/telemetry/events`
 - `GET /api/telemetry/summary`
 
+## Persistencia de logs de telemetria
+
+- Archivo persistente: `backend/logs/telemetry-events.jsonl`
+- Formato: JSON Lines (1 evento por linea)
+- Comportamiento: al iniciar el backend, se cargan eventos historicos del archivo.
+- Nota: estos logs son para analitica y auditoria ligera en entorno local.
+
 ## Convenciones sugeridas para el equipo
 
 - Usar ramas por funcionalidad: `feature/<nombre-corto>`.
