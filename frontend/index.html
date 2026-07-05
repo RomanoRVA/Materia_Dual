@@ -151,6 +151,31 @@
         gap: 10px;
       }
 
+      .admin-panel {
+        margin-top: 14px;
+        border-top: 1px dashed #e6cbb5;
+        padding-top: 12px;
+      }
+
+      .admin-form {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 1fr;
+      }
+
+      .admin-products {
+        margin-top: 10px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .admin-products article {
+        border: 1px solid #efd8c5;
+        border-radius: 10px;
+        padding: 8px;
+        background: #fffdf9;
+      }
+
       .product {
         border: 1px solid #f0d8c5;
         border-radius: 12px;
@@ -249,6 +274,18 @@
 
           <h2>Catalogo visual</h2>
           <div id="catalog" class="catalog"></div>
+
+          <div id="adminPanel" class="admin-panel" style="display: none">
+            <h2>Gestion de productos (admin)</h2>
+            <div class="admin-form">
+              <input id="newProductName" type="text" placeholder="Nombre del producto" />
+              <input id="newProductCategory" type="text" placeholder="Categoria" />
+              <input id="newProductPrice" type="number" min="1" step="0.01" placeholder="Precio" />
+              <button id="addProductBtn" class="secondary">Agregar producto</button>
+            </div>
+            <div id="adminStatus" class="status">Panel inactivo.</div>
+            <div id="adminProducts" class="admin-products"></div>
+          </div>
         </section>
 
         <section class="panel panel-row">
@@ -314,6 +351,13 @@
         loginBtn: document.getElementById('loginBtn'),
         authStatus: document.getElementById('authStatus'),
         catalog: document.getElementById('catalog'),
+        adminPanel: document.getElementById('adminPanel'),
+        newProductName: document.getElementById('newProductName'),
+        newProductCategory: document.getElementById('newProductCategory'),
+        newProductPrice: document.getElementById('newProductPrice'),
+        addProductBtn: document.getElementById('addProductBtn'),
+        adminStatus: document.getElementById('adminStatus'),
+        adminProducts: document.getElementById('adminProducts'),
         cartBody: document.getElementById('cartBody'),
         cartTotal: document.getElementById('cartTotal'),
         createOrderBtn: document.getElementById('createOrderBtn'),
@@ -348,6 +392,27 @@
 
           card.querySelector('button').addEventListener('click', () => addToCart(product.id));
           refs.catalog.appendChild(card);
+        });
+      }
+
+      function renderAdminProducts(products) {
+        refs.adminProducts.innerHTML = '';
+
+        products.forEach((product) => {
+          const row = document.createElement('article');
+          row.innerHTML = `
+            <strong>${product.name}</strong> - ${product.category} - $${product.price} ${
+            product.isActive ? '' : '(inactivo)'
+          }
+            <div class="actions">
+              <button class="secondary" data-disable="${product.id}" ${product.isActive ? '' : 'disabled'}>
+                Desactivar
+              </button>
+            </div>
+          `;
+
+          row.querySelector('button').addEventListener('click', () => deactivateProduct(product.id));
+          refs.adminProducts.appendChild(row);
         });
       }
 
@@ -421,8 +486,96 @@
           state.token = data.token;
           state.user = data.user;
           setStatus(refs.authStatus, `Sesion activa: ${data.user.name} (${data.user.role})`);
+
+          if (state.user.role === 'admin') {
+            refs.adminPanel.style.display = 'block';
+            await loadAdminProducts();
+          } else {
+            refs.adminPanel.style.display = 'none';
+          }
         } catch (error) {
           setStatus(refs.authStatus, 'No fue posible conectar con el backend.', true);
+        }
+      }
+
+      async function loadAdminProducts() {
+        try {
+          const response = await fetch(`${API_URL}/api/admin/products`);
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.adminStatus, data.message || 'No fue posible cargar productos admin.', true);
+            return;
+          }
+
+          renderAdminProducts(data.products || []);
+          setStatus(refs.adminStatus, 'Listado de productos actualizado.');
+        } catch (error) {
+          setStatus(refs.adminStatus, 'Error de comunicacion al consultar productos admin.', true);
+        }
+      }
+
+      async function addProduct() {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.adminStatus, 'Solo un admin puede agregar productos.', true);
+          return;
+        }
+
+        const payload = {
+          name: refs.newProductName.value.trim(),
+          category: refs.newProductCategory.value.trim(),
+          price: Number(refs.newProductPrice.value),
+        };
+
+        if (!payload.name || !payload.category || !Number.isFinite(payload.price) || payload.price <= 0) {
+          setStatus(refs.adminStatus, 'Completa nombre, categoria y precio valido.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.adminStatus, data.message || 'No fue posible agregar el producto.', true);
+            return;
+          }
+
+          setStatus(refs.adminStatus, `Producto agregado: ${data.product.name}`);
+          refs.newProductName.value = '';
+          refs.newProductCategory.value = '';
+          refs.newProductPrice.value = '';
+          await Promise.all([loadProducts(), loadAdminProducts()]);
+        } catch (error) {
+          setStatus(refs.adminStatus, 'Error de comunicacion al crear producto.', true);
+        }
+      }
+
+      async function deactivateProduct(productId) {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.adminStatus, 'Solo un admin puede desactivar productos.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/products/${productId}`, {
+            method: 'DELETE',
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.adminStatus, data.message || 'No fue posible desactivar producto.', true);
+            return;
+          }
+
+          setStatus(refs.adminStatus, `Producto desactivado: ${data.product.name}`);
+          await Promise.all([loadProducts(), loadAdminProducts()]);
+        } catch (error) {
+          setStatus(refs.adminStatus, 'Error de comunicacion al desactivar producto.', true);
         }
       }
 
@@ -515,6 +668,7 @@
       }
 
       refs.loginBtn.addEventListener('click', login);
+      refs.addProductBtn.addEventListener('click', addProduct);
       refs.createOrderBtn.addEventListener('click', createOrder);
       refs.sendKitchenBtn.addEventListener('click', () => updateOrderStage('send'));
       refs.readyBtn.addEventListener('click', () => updateOrderStage('lista'));

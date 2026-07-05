@@ -5,7 +5,14 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "node src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init_products",
+    "prisma:push": "prisma db push",
+    "prisma:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "keywords": [
     "pos",
@@ -15,6 +22,10 @@
   "author": "Equipo Los Pachecos",
   "license": "UNLICENSED",
   "dependencies": {
+    "@prisma/client": "^6.15.0",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.15.0"
   }
 }

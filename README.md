@@ -17,6 +17,13 @@ Sistema de Punto de Venta (POS) para la taqueria **Los Pachecos**, disenado para
 - Envio de orden a cocina y actualizacion de estados.
 - Registro de eventos de telemetria y resumen de metricas.
 
+## Avance actual (Semana 6 - productos en base de datos)
+
+- Catalogo de productos persistente en PostgreSQL con Prisma.
+- Seed inicial con productos y precios de ejemplo.
+- Endpoints admin para crear, actualizar y desactivar productos.
+- Frontend con panel admin para alta de productos y gestion basica.
+
 ## Stack Tecnologico (Base propuesta)
 
 - **Frontend:** HTML5, CSS3 y JavaScript Vanilla
@@ -85,7 +92,12 @@ Prerequisito: tener instalado Node.js LTS (incluye npm).
 
 ```bash
 cd backend
+cp .env.example .env
+# Ajusta DATABASE_URL con tus credenciales reales
 npm install
+npm run prisma:generate
+npm run prisma:push
+npm run prisma:seed
 npm run dev
 ```
 
@@ -105,6 +117,10 @@ Abre `frontend/index.html` en navegador para visualizar la aplicacion base.
 - `GET /health`
 - `POST /api/auth/login`
 - `GET /api/catalog/products`
+- `GET /api/admin/products`
+- `POST /api/admin/products`
+- `PATCH /api/admin/products/:id`
+- `DELETE /api/admin/products/:id`
 - `GET /api/orders`
 - `POST /api/orders`
 - `POST /api/orders/:id/send-kitchen`
