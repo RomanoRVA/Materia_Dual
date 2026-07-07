@@ -9,7 +9,10 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init_products",
     "prisma:push": "prisma db push",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "build:exe": "pkg . --targets node18-win-x64 --output dist/pos-los-pachecos.exe",
+    "build:exe:with-env": "npm run build:exe && copy /Y .env dist\\.env",
+    "run:exe": "dist\\pos-los-pachecos.exe"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -23,9 +26,23 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@prisma/client": "^6.15.0",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2"
   },
   "devDependencies": {
+    "pkg": "^5.8.1",
     "prisma": "^6.15.0"
+  },
+  "bin": "src/server.js",
+  "pkg": {
+    "assets": [
+      "prisma/**/*",
+      ".env.example",
+      "node_modules/@prisma/client/**/*",
+      "node_modules/.prisma/client/**/*"
+    ],
+    "scripts": [
+      "src/**/*.js"
+    ]
   }
 }

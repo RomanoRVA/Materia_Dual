@@ -1,22 +1,27 @@
 const fs = require('fs');
 const path = require('path');
+const dotenv = require('dotenv');
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
+
+const runtimeRoot = process.pkg ? path.dirname(process.execPath) : path.join(__dirname, '..');
+const envFilePath = path.join(runtimeRoot, '.env');
+dotenv.config({ path: envFilePath });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const prisma = new PrismaClient();
 
 const users = [
-  { id: 1, username: 'cajero1', pin: '1234', role: 'cashier', name: 'Caja Principal' },
-  { id: 2, username: 'admin1', pin: '4321', role: 'admin', name: 'Administrador' },
+  { id: 1, username: 'cajero1', accessCode: '100540', role: 'cashier', name: 'Caja Principal' },
+  { id: 2, username: 'admin1', accessCode: '200640', role: 'admin', name: 'Administrador' },
 ];
 
 const orders = [];
 const telemetryEvents = [];
 let orderSequence = 1;
 
-const logsDir = path.join(__dirname, '..', 'logs');
+const logsDir = path.join(runtimeRoot, 'logs');
 const telemetryLogFile = path.join(logsDir, 'telemetry-events.jsonl');
 
 // Middleware base para recibir JSON en futuras rutas del POS.
@@ -127,13 +132,18 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/auth/login', (req, res) => {
-  const { username, pin } = req.body;
+  const { accessCode } = req.body;
 
-  if (!username || !pin) {
-    return res.status(400).json({ message: 'username y pin son requeridos.' });
+  if (!accessCode) {
+    return res.status(400).json({ message: 'accessCode es requerido.' });
   }
 
-  const user = users.find((item) => item.username === username && item.pin === pin);
+  const normalizedCode = String(accessCode).trim();
+  if (!/^\d{4,8}$/.test(normalizedCode)) {
+    return res.status(400).json({ message: 'accessCode debe contener solo numeros (4 a 8 digitos).' });
+  }
+
+  const user = users.find((item) => item.accessCode === normalizedCode);
 
   if (!user) {
     return res.status(401).json({ message: 'Credenciales invalidas.' });

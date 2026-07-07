@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ordenes | POS Los Pachecos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tomato: #cf3f2f;
+        --chipotle: #29140f;
+        --maize: #f5b73b;
+        --smoke: #3f312c;
+        --card: #ffffff;
+        --ok: #1f8a52;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        color: var(--smoke);
+        background:
+          radial-gradient(circle at 0% 0%, #ffd28f 0%, transparent 42%),
+          radial-gradient(circle at 100% 0%, #ffad7e 0%, transparent 38%),
+          linear-gradient(160deg, #fff9ef 0%, #ffe8ce 48%, #fdd4b6 100%);
+        min-height: 100vh;
+      }
+
+      .layout {
+        width: min(1200px, 100%);
+        margin: 0 auto;
+        padding: 24px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .headline {
+        background: var(--chipotle);
+        color: #fff;
+        border-radius: 18px;
+        padding: 20px;
+      }
+
+      .headline h1 {
+        margin: 0;
+        font-family: "Bebas Neue", sans-serif;
+        letter-spacing: 1px;
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: var(--maize);
+      }
+
+      .top-actions {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .main-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        background: var(--card);
+        border-radius: 18px;
+        border: 1px solid #f5d8c0;
+        padding: 18px;
+        box-shadow: 0 10px 26px rgba(82, 37, 20, 0.12);
+      }
+
+      .panel h2 {
+        margin: 0 0 12px;
+        font-size: 1.1rem;
+      }
+
+      button,
+      input {
+        font-family: inherit;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        background: var(--tomato);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      button.secondary {
+        background: #fff;
+        color: var(--chipotle);
+        border: 1px solid #d6b39a;
+      }
+
+      .status {
+        margin-top: 8px;
+        font-size: 0.9rem;
+      }
+
+      .status.ok {
+        color: var(--ok);
+      }
+
+      .status.error {
+        color: #b02b2b;
+      }
+
+      .catalog {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+      }
+
+      .product {
+        border: 1px solid #f0d8c5;
+        border-radius: 12px;
+        padding: 12px;
+        background: #fffcf8;
+      }
+
+      .product h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+
+      .chips {
+        display: inline-block;
+        background: #ffe4bf;
+        color: #7a4b16;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 0.8rem;
+      }
+
+      .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .cart-table th,
+      .cart-table td {
+        padding: 8px;
+        border-bottom: 1px solid #f2dfcf;
+        text-align: left;
+        font-size: 0.9rem;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .kpi {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 8px;
+      }
+
+      .kpi-item {
+        border: 1px solid #ecd4c0;
+        border-radius: 12px;
+        background: #fffdfa;
+        padding: 10px;
+      }
+
+      .kpi-item strong {
+        display: block;
+        font-size: 1.25rem;
+      }
+
+      .admin-panel {
+        margin-top: 14px;
+        border-top: 1px dashed #e6cbb5;
+        padding-top: 12px;
+      }
+
+      .admin-form {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 1fr;
+      }
+
+      .admin-form input {
+        width: 100%;
+        border: 1px solid #e7c9b0;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      .admin-products {
+        margin-top: 10px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .admin-products article {
+        border: 1px solid #efd8c5;
+        border-radius: 10px;
+        padding: 8px;
+        background: #fffdf9;
+      }
+
+      @media (min-width: 980px) {
+        .main-grid {
+          grid-template-columns: 1.2fr 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <header class="headline">
+        <h1>POS LOS PACHECOS</h1>
+        <div class="top-actions">
+          <span id="sessionInfo">Sesion activa</span>
+          <button class="secondary" id="logoutBtn">Cerrar sesion</button>
+        </div>
+      </header>
+
+      <div class="main-grid">
+        <section class="panel">
+          <h2>Catalogo visual</h2>
+          <div id="catalog" class="catalog"></div>
+
+          <div id="adminPanel" class="admin-panel" style="display: none">
+            <h2>Gestion de productos (admin)</h2>
+            <div class="admin-form">
+              <input id="newProductName" type="text" placeholder="Nombre del producto" />
+              <input id="newProductCategory" type="text" placeholder="Categoria" />
+              <input id="newProductPrice" type="number" min="1" step="0.01" placeholder="Precio" />
+              <button id="addProductBtn" class="secondary">Agregar producto</button>
+            </div>
+            <div id="adminStatus" class="status">Panel inactivo.</div>
+            <div id="adminProducts" class="admin-products"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Orden actual</h2>
+          <table class="cart-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cant.</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="cartBody"></tbody>
+          </table>
+          <p><strong>Total:</strong> $<span id="cartTotal">0</span></p>
+
+          <div class="actions">
+            <button id="createOrderBtn">Crear orden</button>
+            <button id="sendKitchenBtn" class="secondary">Enviar a cocina</button>
+            <button id="readyBtn" class="secondary">Marcar lista</button>
+            <button id="deliverBtn" class="secondary">Marcar entregada</button>
+          </div>
+          <div id="orderStatus" class="status">No hay orden activa.</div>
+
+          <h2>Telemetria</h2>
+          <div class="kpi">
+            <div class="kpi-item">
+              <span>Ordenes</span>
+              <strong id="kpiOrders">0</strong>
+            </div>
+            <div class="kpi-item">
+              <span>Entregadas</span>
+              <strong id="kpiDelivered">0</strong>
+            </div>
+            <div class="kpi-item">
+              <span>Eventos</span>
+              <strong id="kpiEvents">0</strong>
+            </div>
+            <div class="kpi-item">
+              <span>Tiempo prom.</span>
+              <strong><span id="kpiAvg">0</span>s</strong>
+            </div>
+          </div>
+          <button id="refreshTelemetryBtn" class="secondary">Actualizar metricas</button>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = 'http://localhost:3000';
+      const sessionRaw = localStorage.getItem('posSession');
+
+      if (!sessionRaw) {
+        window.location.href = './login.html';
+      }
+
+      let session;
+      try {
+        session = JSON.parse(sessionRaw);
+      } catch (error) {
+        localStorage.removeItem('posSession');
+        window.location.href = './login.html';
+      }
+
+      const state = {
+        token: session?.token || null,
+        user: session?.user || null,
+        products: [],
+        cart: [],
+        lastOrderId: null,
+      };
+
+      const refs = {
+        sessionInfo: document.getElementById('sessionInfo'),
+        logoutBtn: document.getElementById('logoutBtn'),
+        catalog: document.getElementById('catalog'),
+        adminPanel: document.getElementById('adminPanel'),
+        newProductName: document.getElementById('newProductName'),
+        newProductCategory: document.getElementById('newProductCategory'),
+        newProductPrice: document.getElementById('newProductPrice'),
+        addProductBtn: document.getElementById('addProductBtn'),
+        adminStatus: document.getElementById('adminStatus'),
+        adminProducts: document.getElementById('adminProducts'),
+        cartBody: document.getElementById('cartBody'),
+        cartTotal: document.getElementById('cartTotal'),
+        createOrderBtn: document.getElementById('createOrderBtn'),
+        sendKitchenBtn: document.getElementById('sendKitchenBtn'),
+        readyBtn: document.getElementById('readyBtn'),
+        deliverBtn: document.getElementById('deliverBtn'),
+        orderStatus: document.getElementById('orderStatus'),
+        kpiOrders: document.getElementById('kpiOrders'),
+        kpiDelivered: document.getElementById('kpiDelivered'),
+        kpiEvents: document.getElementById('kpiEvents'),
+        kpiAvg: document.getElementById('kpiAvg'),
+        refreshTelemetryBtn: document.getElementById('refreshTelemetryBtn'),
+      };
+
+      function setStatus(element, message, isError = false) {
+        element.textContent = message;
+        element.classList.toggle('error', isError);
+        element.classList.toggle('ok', !isError);
+      }
+
+      function renderCatalog() {
+        refs.catalog.innerHTML = '';
+        state.products.forEach((product) => {
+          const card = document.createElement('article');
+          card.className = 'product';
+          card.innerHTML = `
+            <h3>${product.name}</h3>
+            <span class="chips">${product.category}</span>
+            <p><strong>$${product.price}</strong></p>
+            <button data-id="${product.id}">Agregar</button>
+          `;
+
+          card.querySelector('button').addEventListener('click', () => addToCart(product.id));
+          refs.catalog.appendChild(card);
+        });
+      }
+
+      function renderAdminProducts(products) {
+        refs.adminProducts.innerHTML = '';
+
+        products.forEach((product) => {
+          const row = document.createElement('article');
+          row.innerHTML = `
+            <strong>${product.name}</strong> - ${product.category} - $${product.price} ${
+            product.isActive ? '' : '(inactivo)'
+          }
+            <div class="actions">
+              <button class="secondary" data-disable="${product.id}" ${product.isActive ? '' : 'disabled'}>
+                Desactivar
+              </button>
+            </div>
+          `;
+
+          row.querySelector('button').addEventListener('click', () => deactivateProduct(product.id));
+          refs.adminProducts.appendChild(row);
+        });
+      }
+
+      function addToCart(productId) {
+        const product = state.products.find((item) => item.id === productId);
+        if (!product) {
+          return;
+        }
+
+        const existing = state.cart.find((item) => item.productId === productId);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          state.cart.push({ productId: product.id, name: product.name, price: product.price, quantity: 1 });
+        }
+
+        renderCart();
+      }
+
+      function removeFromCart(productId) {
+        state.cart = state.cart.filter((item) => item.productId !== productId);
+        renderCart();
+      }
+
+      function renderCart() {
+        refs.cartBody.innerHTML = '';
+        let total = 0;
+
+        state.cart.forEach((item) => {
+          const subtotal = item.price * item.quantity;
+          total += subtotal;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>$${subtotal}</td>
+            <td><button class="secondary" data-remove="${item.productId}">Quitar</button></td>
+          `;
+          row.querySelector('button').addEventListener('click', () => removeFromCart(item.productId));
+          refs.cartBody.appendChild(row);
+        });
+
+        refs.cartTotal.textContent = String(total);
+      }
+
+      async function loadProducts() {
+        const response = await fetch(`${API_URL}/api/catalog/products`);
+        const data = await response.json();
+        state.products = data.products || [];
+        renderCatalog();
+      }
+
+      async function loadAdminProducts() {
+        try {
+          const response = await fetch(`${API_URL}/api/admin/products`);
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.adminStatus, data.message || 'No fue posible cargar productos admin.', true);
+            return;
+          }
+
+          renderAdminProducts(data.products || []);
+          setStatus(refs.adminStatus, 'Listado de productos actualizado.');
+        } catch (error) {
+          setStatus(refs.adminStatus, 'Error de comunicacion al consultar productos admin.', true);
+        }
+      }
+
+      async function addProduct() {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.adminStatus, 'Solo un admin puede agregar productos.', true);
+          return;
+        }
+
+        const payload = {
+          name: refs.newProductName.value.trim(),
+          category: refs.newProductCategory.value.trim(),
+          price: Number(refs.newProductPrice.value),
+        };
+
+        if (!payload.name || !payload.category || !Number.isFinite(payload.price) || payload.price <= 0) {
+          setStatus(refs.adminStatus, 'Completa nombre, categoria y precio valido.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.adminStatus, data.message || 'No fue posible agregar el producto.', true);
+            return;
+          }
+
+          setStatus(refs.adminStatus, `Producto agregado: ${data.product.name}`);
+          refs.newProductName.value = '';
+          refs.newProductCategory.value = '';
+          refs.newProductPrice.value = '';
+          await Promise.all([loadProducts(), loadAdminProducts()]);
+        } catch (error) {
+          setStatus(refs.adminStatus, 'Error de comunicacion al crear producto.', true);
+        }
+      }
+
+      async function deactivateProduct(productId) {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.adminStatus, 'Solo un admin puede desactivar productos.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/products/${productId}`, {
+            method: 'DELETE',
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.adminStatus, data.message || 'No fue posible desactivar producto.', true);
+            return;
+          }
+
+          setStatus(refs.adminStatus, `Producto desactivado: ${data.product.name}`);
+          await Promise.all([loadProducts(), loadAdminProducts()]);
+        } catch (error) {
+          setStatus(refs.adminStatus, 'Error de comunicacion al desactivar producto.', true);
+        }
+      }
+
+      async function createOrder() {
+        if (!state.user) {
+          setStatus(refs.orderStatus, 'Sesion no valida. Vuelve a iniciar.', true);
+          return;
+        }
+
+        if (!state.cart.length) {
+          setStatus(refs.orderStatus, 'Agrega al menos un producto a la orden.', true);
+          return;
+        }
+
+        try {
+          const items = state.cart.map((item) => ({ productId: item.productId, quantity: item.quantity }));
+          const response = await fetch(`${API_URL}/api/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items, createdBy: state.user.username }),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.orderStatus, data.message || 'No fue posible crear la orden.', true);
+            return;
+          }
+
+          state.lastOrderId = data.order.id;
+          state.cart = [];
+          renderCart();
+          setStatus(refs.orderStatus, `Orden #${data.order.id} creada con exito.`);
+          await refreshTelemetry();
+        } catch (error) {
+          setStatus(refs.orderStatus, 'Error de comunicacion con backend.', true);
+        }
+      }
+
+      async function updateOrderStage(action) {
+        if (!state.lastOrderId) {
+          setStatus(refs.orderStatus, 'Primero crea una orden para continuar.', true);
+          return;
+        }
+
+        try {
+          let url = `${API_URL}/api/orders/${state.lastOrderId}/send-kitchen`;
+          let method = 'POST';
+          let body;
+
+          if (action === 'lista' || action === 'entregada') {
+            url = `${API_URL}/api/orders/${state.lastOrderId}/status`;
+            method = 'PATCH';
+            body = JSON.stringify({ status: action });
+          }
+
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body,
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            setStatus(refs.orderStatus, data.message || 'No se pudo actualizar la orden.', true);
+            return;
+          }
+
+          setStatus(refs.orderStatus, `Orden #${data.order.id} en estado: ${data.order.status}`);
+          await refreshTelemetry();
+        } catch (error) {
+          setStatus(refs.orderStatus, 'Error al actualizar estado de orden.', true);
+        }
+      }
+
+      async function refreshTelemetry() {
+        try {
+          const response = await fetch(`${API_URL}/api/telemetry/summary`);
+          const data = await response.json();
+
+          refs.kpiOrders.textContent = String(data.totals.orders || 0);
+          refs.kpiDelivered.textContent = String(data.totals.delivered || 0);
+          refs.kpiEvents.textContent = String(data.totals.telemetryEvents || 0);
+          refs.kpiAvg.textContent = String(data.avgProcessingSeconds || 0);
+        } catch (error) {
+          refs.kpiOrders.textContent = '-';
+          refs.kpiDelivered.textContent = '-';
+          refs.kpiEvents.textContent = '-';
+          refs.kpiAvg.textContent = '-';
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem('posSession');
+        window.location.href = './login.html';
+      }
+
+      refs.sessionInfo.textContent = `Sesion activa: ${state.user.name} (${state.user.role})`;
+      refs.logoutBtn.addEventListener('click', logout);
+      refs.addProductBtn.addEventListener('click', addProduct);
+      refs.createOrderBtn.addEventListener('click', createOrder);
+      refs.sendKitchenBtn.addEventListener('click', () => updateOrderStage('send'));
+      refs.readyBtn.addEventListener('click', () => updateOrderStage('lista'));
+      refs.deliverBtn.addEventListener('click', () => updateOrderStage('entregada'));
+      refs.refreshTelemetryBtn.addEventListener('click', refreshTelemetry);
+
+      if (state.user.role === 'admin') {
+        refs.adminPanel.style.display = 'block';
+        loadAdminProducts();
+      }
+
+      Promise.all([loadProducts(), refreshTelemetry()]).catch(() => {
+        setStatus(refs.orderStatus, 'Backend no disponible. Inicia el servidor en puerto 3000.', true);
+      });
+    </script>
+  </body>
+</html>

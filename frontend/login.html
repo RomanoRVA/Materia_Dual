@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | POS Los Pachecos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --tomato: #cf3f2f;
+        --chipotle: #29140f;
+        --maize: #f5b73b;
+        --smoke: #3f312c;
+        --ok: #1f8a52;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        color: var(--smoke);
+        background:
+          radial-gradient(circle at 0% 0%, #ffd28f 0%, transparent 42%),
+          radial-gradient(circle at 100% 0%, #ffad7e 0%, transparent 38%),
+          linear-gradient(160deg, #fff9ef 0%, #ffe8ce 48%, #fdd4b6 100%);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+      }
+
+      .card {
+        width: min(500px, 100%);
+        background: #fff;
+        border: 1px solid #f5d8c0;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 10px 26px rgba(82, 37, 20, 0.14);
+      }
+
+      h1 {
+        margin: 0;
+        font-family: "Bebas Neue", sans-serif;
+        letter-spacing: 1px;
+        font-size: 2rem;
+        color: var(--chipotle);
+      }
+
+      p {
+        margin: 8px 0 16px;
+      }
+
+      label {
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      input,
+      button {
+        font-family: inherit;
+      }
+
+      .access-code-box {
+        width: 100%;
+        border: 1px solid #ead3bf;
+        border-radius: 12px;
+        background: #fffdf9;
+        font-size: 1.3rem;
+        text-align: center;
+        letter-spacing: 4px;
+        padding: 10px;
+        margin-top: 8px;
+      }
+
+      .numpad {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        cursor: pointer;
+        background: var(--tomato);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      button.secondary {
+        background: #fff;
+        color: var(--chipotle);
+        border: 1px solid #d6b39a;
+      }
+
+      .status {
+        margin-top: 12px;
+        font-size: 0.92rem;
+      }
+
+      .status.ok {
+        color: var(--ok);
+      }
+
+      .status.error {
+        color: #b02b2b;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>POS LOS PACHECOS</h1>
+      <p>Acceso con combinacion numerica</p>
+
+      <label for="accessCode">Codigo de acceso</label>
+      <input
+        id="accessCode"
+        class="access-code-box"
+        type="password"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        maxlength="8"
+        placeholder="Ejemplo: 100540"
+      />
+
+      <div class="numpad" id="numpad">
+        <button type="button" data-key="1">1</button>
+        <button type="button" data-key="2">2</button>
+        <button type="button" data-key="3">3</button>
+        <button type="button" data-key="4">4</button>
+        <button type="button" data-key="5">5</button>
+        <button type="button" data-key="6">6</button>
+        <button type="button" data-key="7">7</button>
+        <button type="button" data-key="8">8</button>
+        <button type="button" data-key="9">9</button>
+        <button type="button" id="clearCodeBtn" class="secondary">Limpiar</button>
+        <button type="button" data-key="0">0</button>
+        <button type="button" id="backspaceCodeBtn" class="secondary">Borrar</button>
+      </div>
+
+      <div style="margin-top: 10px">
+        <button id="loginBtn" style="width: 100%">Ingresar</button>
+      </div>
+
+      <div id="authStatus" class="status">Sin autenticar.</div>
+    </main>
+
+    <script>
+      const API_URL = 'http://localhost:3000';
+      const refs = {
+        accessCode: document.getElementById('accessCode'),
+        numpad: document.getElementById('numpad'),
+        clearCodeBtn: document.getElementById('clearCodeBtn'),
+        backspaceCodeBtn: document.getElementById('backspaceCodeBtn'),
+        loginBtn: document.getElementById('loginBtn'),
+        authStatus: document.getElementById('authStatus'),
+      };
+
+      function setStatus(message, isError = false) {
+        refs.authStatus.textContent = message;
+        refs.authStatus.classList.toggle('error', isError);
+        refs.authStatus.classList.toggle('ok', !isError);
+      }
+
+      function sanitizeAccessCode(value) {
+        return String(value || '')
+          .replace(/\D/g, '')
+          .slice(0, 8);
+      }
+
+      function appendAccessDigit(digit) {
+        refs.accessCode.value = sanitizeAccessCode(`${refs.accessCode.value}${digit}`);
+      }
+
+      async function login() {
+        const accessCode = sanitizeAccessCode(refs.accessCode.value);
+
+        if (accessCode.length < 4) {
+          setStatus('Ingresa un codigo valido de 4 a 8 digitos.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessCode }),
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            setStatus(data.message || 'Error de autenticacion.', true);
+            return;
+          }
+
+          localStorage.setItem('posSession', JSON.stringify({ token: data.token, user: data.user }));
+          setStatus(`Sesion activa: ${data.user.name}`);
+          setTimeout(() => {
+            window.location.href = './orders.html';
+          }, 300);
+        } catch (error) {
+          setStatus('No fue posible conectar con el backend.', true);
+        }
+      }
+
+      refs.numpad.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-key]');
+        if (!button) {
+          return;
+        }
+
+        appendAccessDigit(button.getAttribute('data-key'));
+      });
+
+      refs.accessCode.addEventListener('input', () => {
+        refs.accessCode.value = sanitizeAccessCode(refs.accessCode.value);
+      });
+
+      refs.accessCode.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          login();
+        }
+      });
+
+      refs.clearCodeBtn.addEventListener('click', () => {
+        refs.accessCode.value = '';
+      });
+
+      refs.backspaceCodeBtn.addEventListener('click', () => {
+        refs.accessCode.value = refs.accessCode.value.slice(0, -1);
+      });
+
+      refs.loginBtn.addEventListener('click', login);
+
+      const existingSession = localStorage.getItem('posSession');
+      if (existingSession) {
+        window.location.href = './orders.html';
+      }
+    </script>
+  </body>
+</html>
