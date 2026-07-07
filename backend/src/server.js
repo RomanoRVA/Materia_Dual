@@ -464,9 +464,9 @@ async function startServer() {
 
   try {
     await prisma.$connect();
-    console.log('[db] Conexion a PostgreSQL lista.');
+    console.log('[db] Conexion a base de datos lista.');
   } catch (error) {
-    console.error('[db] No fue posible conectar con PostgreSQL. Revisa DATABASE_URL.');
+    console.error('[db] No fue posible conectar con la base de datos. Revisa DATABASE_URL.');
     console.error(error.message);
     process.exit(1);
   }

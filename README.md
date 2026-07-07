@@ -19,7 +19,7 @@ Sistema de Punto de Venta (POS) para la taqueria **Los Pachecos**, disenado para
 
 ## Avance actual (Semana 6 - productos en base de datos)
 
-- Catalogo de productos persistente en PostgreSQL con Prisma.
+- Catalogo de productos persistente en MySQL (Amazon RDS) con Prisma.
 - Seed inicial con productos y precios de ejemplo.
 - Endpoints admin para crear, actualizar y desactivar productos.
 - Frontend con panel admin para alta de productos y gestion basica.
@@ -28,7 +28,7 @@ Sistema de Punto de Venta (POS) para la taqueria **Los Pachecos**, disenado para
 
 - **Frontend:** HTML5, CSS3 y JavaScript Vanilla
 - **Backend:** Node.js con Express
-- **Base de Datos:** PostgreSQL
+- **Base de Datos:** MySQL (Amazon RDS)
 
 > Nota: esta base puede migrarse despues a React/FastAPI/MySQL sin perder la estructura general.
 
@@ -93,7 +93,7 @@ Prerequisito: tener instalado Node.js LTS (incluye npm).
 ```bash
 cd backend
 cp .env.example .env
-# Ajusta DATABASE_URL con tus credenciales reales
+# Ajusta DATABASE_URL con tu endpoint y credenciales de Amazon RDS MySQL
 npm install
 npm run prisma:generate
 npm run prisma:push
@@ -127,6 +127,13 @@ Abre `frontend/index.html` en navegador para visualizar la aplicacion base.
 - `PATCH /api/orders/:id/status`
 - `GET /api/telemetry/events`
 - `GET /api/telemetry/summary`
+
+## Conexion a Amazon RDS MySQL
+
+- Guia detallada: `docs/rds-mysql-setup.md`
+- Variable principal: `DATABASE_URL` en `backend/.env`
+- Ejemplo de cadena:
+	`mysql://admin:TU_PASSWORD@TU_ENDPOINT_RDS:3306/pos_los_pachecos?sslaccept=strict`
 
 ## Persistencia de logs de telemetria
 

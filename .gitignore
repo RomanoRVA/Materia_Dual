@@ -14,6 +14,9 @@ backend/logs/*.jsonl
 !.env.example
 !**/.env.example
 
+# Local TLS certificates
+backend/global-bundle.pem
+
 # OS files
 .DS_Store
 Thumbs.db
