@@ -12,7 +12,7 @@
     "prisma:seed": "prisma db seed",
     "build:exe": "pkg . --targets node18-win-x64 --output dist/pos-los-pachecos.exe",
     "build:exe:with-env": "npm run build:exe && copy /Y .env dist\\.env",
-    "run:exe": "dist\\pos-los-pachecos.exe"
+    "run:exe": "node -e \"console.error('run:exe deshabilitado: usa npm run dev o start.ps1 para Prisma/RDS estable.'); process.exit(1)\""
   },
   "prisma": {
     "seed": "node prisma/seed.js"

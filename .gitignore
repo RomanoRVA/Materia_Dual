@@ -1,6 +1,7 @@
 # Node dependencies
 node_modules/
 backend/dist/
+desktop/node_modules/
 
 # Logs
 npm-debug.log*
@@ -8,6 +9,7 @@ yarn-debug.log*
 yarn-error.log*
 backend/logs/*.jsonl
 !backend/logs/.gitkeep
+.runtime/
 
 # Environment files
 .env

@@ -16,6 +16,611 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  purchaseDetails    DetalleCompra[]     @relation("DetalleCompraProduct")
+  inventoryStocks    InventoryStock[]    @relation("InventoryStockProduct")
+  inventoryMovements InventoryMovement[] @relation("InventoryMovementProduct")
+  inventoryAlerts    InventoryAlert[]    @relation("InventoryAlertProduct")
+
   @@index([isActive])
   @@map("products")
+}
+
+model Employee {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  accessCode String   @unique
+  role       String
+  name       String
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  openedCashBoxes       Caja[]               @relation("CajaOpenedBy")
+  closedCashBoxes       Caja[]               @relation("CajaClosedBy")
+  cashMovements         MovimientoCaja[]     @relation("MovimientoCajaEmployee")
+  purchases             Compra[]             @relation("CompraEmployee")
+  logEntries            Bitacora[]           @relation("BitacoraEmployee")
+  auditEntries          Auditoria[]          @relation("AuditoriaEmployee")
+  permissionAssignments EmployeePermission[] @relation("EmployeePermissionEmployee")
+  permissionsGranted    EmployeePermission[] @relation("EmployeePermissionGrantedBy")
+  roleAssignments       EmployeeRole[]       @relation("EmployeeRoleEmployee")
+  rolesGranted          EmployeeRole[]       @relation("EmployeeRoleGrantedBy")
+  authSessions          AuthSession[]
+  loginAttempts         LoginAttempt[]
+  passwordResetTokens   PasswordResetToken[]
+  devices               AuthDevice[]
+  inventoryMovements    InventoryMovement[]  @relation("InventoryMovementEmployee")
+
+  @@index([role, isActive])
+  @@map("employees")
+}
+
+model AuthDevice {
+  id         Int      @id @default(autoincrement())
+  employeeId Int?
+  deviceId   String   @unique @db.VarChar(80)
+  deviceName String?  @db.VarChar(160)
+  userAgent  String?  @db.VarChar(255)
+  ipAddress  String?  @db.VarChar(64)
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  employee Employee?     @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  sessions AuthSession[]
+
+  @@index([employeeId])
+  @@index([lastSeenAt])
+  @@map("auth_devices")
+}
+
+model AuthSession {
+  id               Int       @id @default(autoincrement())
+  employeeId       Int
+  deviceId         Int?
+  accessTokenHash  String    @unique @db.VarChar(128)
+  refreshTokenHash String    @unique @db.VarChar(128)
+  status           String    @default("active") @db.VarChar(24)
+  ipAddress        String?   @db.VarChar(64)
+  userAgent        String?   @db.VarChar(255)
+  expiresAt        DateTime
+  refreshExpiresAt DateTime
+  lastSeenAt       DateTime  @default(now())
+  revokedAt        DateTime?
+  revokedByUserId  Int?
+  revokedReason    String?   @db.VarChar(160)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  employee Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  device   AuthDevice? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+
+  @@index([employeeId, status])
+  @@index([deviceId])
+  @@index([expiresAt])
+  @@index([refreshExpiresAt])
+  @@map("auth_sessions")
+}
+
+model LoginAttempt {
+  id            Int      @id @default(autoincrement())
+  employeeId    Int?
+  accessCode    String?  @db.VarChar(32)
+  ipAddress     String?  @db.VarChar(64)
+  userAgent     String?  @db.VarChar(255)
+  success       Boolean  @default(false)
+  failureReason String?  @db.VarChar(160)
+  createdAt     DateTime @default(now())
+
+  employee Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+
+  @@index([employeeId, createdAt])
+  @@index([accessCode, createdAt])
+  @@index([ipAddress, createdAt])
+  @@map("login_attempts")
+}
+
+model PasswordResetToken {
+  id          Int       @id @default(autoincrement())
+  employeeId  Int
+  tokenHash   String    @unique @db.VarChar(128)
+  status      String    @default("pending") @db.VarChar(24)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  requestedIp String?   @db.VarChar(64)
+  userAgent   String?   @db.VarChar(255)
+  createdAt   DateTime  @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId, status])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model Sale {
+  id             Int      @id @default(autoincrement())
+  orderId        Int      @unique
+  paidDay        String   @db.VarChar(10)
+  total          Decimal  @db.Decimal(10, 2)
+  paymentMethod  String
+  amountReceived Decimal  @db.Decimal(10, 2)
+  change         Decimal  @db.Decimal(10, 2)
+  createdByUser  String
+  itemCount      Int
+  paidAt         DateTime
+  cutReference   String?  @db.VarChar(64)
+  createdAt      DateTime @default(now())
+
+  cashMovements MovimientoCaja[] @relation("MovimientoCajaSale")
+
+  @@index([paidDay])
+  @@index([cutReference])
+  @@map("sales")
+}
+
+model TableAccount {
+  id              Int      @id @default(autoincrement())
+  tableNumber     Int      @unique
+  guestCount      Int?
+  status          String   @default("open") @db.VarChar(16)
+  updatedBy       String?  @db.VarChar(80)
+  updatedByUserId Int?
+  lastOrderId     Int?
+  createdAt       DateTime @default(now()) @db.DateTime(0)
+  updatedAt       DateTime @default(now()) @updatedAt @db.DateTime(0)
+
+  items TableAccountItem[]
+
+  @@index([status])
+  @@map("table_accounts")
+}
+
+model TableAccountItem {
+  id          Int      @id @default(autoincrement())
+  accountId   Int
+  productId   Int
+  productName String   @db.VarChar(120)
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  quantity    Int
+  notes       String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  updatedAt   DateTime @default(now()) @updatedAt @db.DateTime(0)
+
+  account TableAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@map("table_account_items")
+}
+
+model DailyCut {
+  id                Int      @id @default(autoincrement())
+  reference         String   @unique @db.VarChar(64)
+  cutDate           DateTime @db.Date
+  ordersCount       Int      @default(0)
+  revenue           Decimal  @default(0) @db.Decimal(12, 2)
+  generatedBy       String   @db.VarChar(80)
+  generatedByUserId Int?
+  createdAt         DateTime @default(now()) @db.DateTime(0)
+
+  @@map("daily_cuts")
+}
+
+model Empresa {
+  id        Int      @id @default(autoincrement())
+  legalName String   @db.VarChar(160)
+  tradeName String   @db.VarChar(160)
+  taxId     String?  @db.VarChar(32)
+  phone     String?  @db.VarChar(32)
+  email     String?  @db.VarChar(120)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branches            Sucursal[]
+  suppliers           Proveedor[]
+  logEntries          Bitacora[]
+  auditEntries        Auditoria[]
+  employeePermissions EmployeePermission[]
+  employeeRoles       EmployeeRole[]
+
+  @@index([isActive])
+  @@index([taxId])
+  @@map("empresas")
+}
+
+model Sucursal {
+  id        Int      @id @default(autoincrement())
+  empresaId Int
+  code      String   @db.VarChar(32)
+  name      String   @db.VarChar(120)
+  address   String?  @db.VarChar(255)
+  phone     String?  @db.VarChar(32)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  empresa             Empresa              @relation(fields: [empresaId], references: [id], onDelete: Restrict)
+  cashBoxes           Caja[]
+  cashMovements       MovimientoCaja[]
+  suppliers           Proveedor[]
+  purchases           Compra[]
+  logEntries          Bitacora[]
+  auditEntries        Auditoria[]
+  employeePermissions EmployeePermission[]
+  employeeRoles       EmployeeRole[]
+  inventoryStocks     InventoryStock[]
+
+  @@unique([empresaId, code])
+  @@index([empresaId, isActive])
+  @@map("sucursales")
+}
+
+model InventoryStock {
+  id          Int      @id @default(autoincrement())
+  productId   Int?
+  productName String   @db.VarChar(160)
+  sucursalId  Int?
+  locationKey String   @default("global") @db.VarChar(80)
+  quantity    Decimal  @default(0) @db.Decimal(12, 3)
+  averageCost Decimal  @default(0) @db.Decimal(12, 2)
+  lastCost    Decimal  @default(0) @db.Decimal(12, 2)
+  minStock    Decimal  @default(0) @db.Decimal(12, 3)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product       Product?            @relation("InventoryStockProduct", fields: [productId], references: [id], onDelete: SetNull)
+  sucursal      Sucursal?           @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+  fromMovements InventoryMovement[] @relation("InventoryMovementFromStock")
+  toMovements   InventoryMovement[] @relation("InventoryMovementToStock")
+  alerts        InventoryAlert[]
+
+  @@unique([productId, locationKey])
+  @@index([productId])
+  @@index([sucursalId])
+  @@index([locationKey])
+  @@index([quantity])
+  @@index([minStock])
+  @@map("inventory_stock")
+}
+
+model InventoryMovement {
+  id               Int      @id @default(autoincrement())
+  productId        Int?
+  productName      String   @db.VarChar(160)
+  fromStockId      Int?
+  toStockId        Int?
+  type             String   @db.VarChar(32)
+  direction        String   @db.VarChar(24)
+  quantity         Decimal  @db.Decimal(12, 3)
+  unitCost         Decimal  @default(0) @db.Decimal(12, 2)
+  totalCost        Decimal  @default(0) @db.Decimal(12, 2)
+  previousQuantity Decimal? @db.Decimal(12, 3)
+  newQuantity      Decimal? @db.Decimal(12, 3)
+  referenceType    String?  @db.VarChar(40)
+  referenceId      String?  @db.VarChar(80)
+  reason           String?  @db.VarChar(160)
+  notes            String?  @db.VarChar(255)
+  createdByUserId  Int?
+  createdByUser    String?  @db.VarChar(80)
+  createdAt        DateTime @default(now())
+
+  product           Product?        @relation("InventoryMovementProduct", fields: [productId], references: [id], onDelete: SetNull)
+  fromStock         InventoryStock? @relation("InventoryMovementFromStock", fields: [fromStockId], references: [id], onDelete: SetNull)
+  toStock           InventoryStock? @relation("InventoryMovementToStock", fields: [toStockId], references: [id], onDelete: SetNull)
+  createdByEmployee Employee?       @relation("InventoryMovementEmployee", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@index([productId, createdAt])
+  @@index([type, createdAt])
+  @@index([referenceType, referenceId])
+  @@index([fromStockId])
+  @@index([toStockId])
+  @@index([createdByUserId, createdAt])
+  @@map("inventory_movements")
+}
+
+model InventoryAlert {
+  id              Int       @id @default(autoincrement())
+  stockId         Int
+  productId       Int?
+  type            String    @default("min_stock") @db.VarChar(32)
+  status          String    @default("open") @db.VarChar(24)
+  threshold       Decimal   @db.Decimal(12, 3)
+  currentQuantity Decimal   @db.Decimal(12, 3)
+  message         String    @db.VarChar(255)
+  createdAt       DateTime  @default(now())
+  resolvedAt      DateTime?
+
+  stock   InventoryStock @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  product Product?       @relation("InventoryAlertProduct", fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([stockId, status])
+  @@index([productId, status])
+  @@index([type, status])
+  @@index([createdAt])
+  @@map("inventory_alerts")
+}
+
+model Caja {
+  id                 Int       @id @default(autoincrement())
+  sucursalId         Int
+  code               String    @db.VarChar(32)
+  name               String    @db.VarChar(120)
+  status             String    @default("closed") @db.VarChar(24)
+  openingBalance     Decimal   @default(0) @db.Decimal(12, 2)
+  currentBalance     Decimal   @default(0) @db.Decimal(12, 2)
+  openedAt           DateTime?
+  closedAt           DateTime?
+  openedByEmployeeId Int?
+  closedByEmployeeId Int?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  sucursal         Sucursal         @relation(fields: [sucursalId], references: [id], onDelete: Restrict)
+  openedByEmployee Employee?        @relation("CajaOpenedBy", fields: [openedByEmployeeId], references: [id], onDelete: SetNull)
+  closedByEmployee Employee?        @relation("CajaClosedBy", fields: [closedByEmployeeId], references: [id], onDelete: SetNull)
+  movements        MovimientoCaja[]
+
+  @@unique([sucursalId, code])
+  @@index([sucursalId, status])
+  @@index([openedByEmployeeId])
+  @@index([closedByEmployeeId])
+  @@map("cajas")
+}
+
+model MovimientoCaja {
+  id            Int      @id @default(autoincrement())
+  cajaId        Int
+  sucursalId    Int
+  employeeId    Int?
+  saleId        Int?
+  compraId      Int?
+  type          String   @db.VarChar(32)
+  concept       String   @db.VarChar(160)
+  amount        Decimal  @db.Decimal(12, 2)
+  paymentMethod String?  @db.VarChar(32)
+  reference     String?  @db.VarChar(80)
+  notes         String?  @db.VarChar(255)
+  occurredAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  caja     Caja      @relation(fields: [cajaId], references: [id], onDelete: Restrict)
+  sucursal Sucursal  @relation(fields: [sucursalId], references: [id], onDelete: Restrict)
+  employee Employee? @relation("MovimientoCajaEmployee", fields: [employeeId], references: [id], onDelete: SetNull)
+  sale     Sale?     @relation("MovimientoCajaSale", fields: [saleId], references: [id], onDelete: SetNull)
+  compra   Compra?   @relation("MovimientoCajaCompra", fields: [compraId], references: [id], onDelete: SetNull)
+
+  @@index([cajaId, occurredAt])
+  @@index([sucursalId, occurredAt])
+  @@index([employeeId, occurredAt])
+  @@index([type, occurredAt])
+  @@index([saleId])
+  @@index([compraId])
+  @@map("movimientos_caja")
+}
+
+model Proveedor {
+  id           Int      @id @default(autoincrement())
+  empresaId    Int
+  sucursalId   Int?
+  businessName String   @db.VarChar(160)
+  contactName  String?  @db.VarChar(120)
+  taxId        String?  @db.VarChar(32)
+  phone        String?  @db.VarChar(32)
+  email        String?  @db.VarChar(120)
+  address      String?  @db.VarChar(255)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  empresa   Empresa   @relation(fields: [empresaId], references: [id], onDelete: Restrict)
+  sucursal  Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+  purchases Compra[]
+
+  @@unique([empresaId, businessName])
+  @@index([empresaId, isActive])
+  @@index([sucursalId])
+  @@index([taxId])
+  @@map("proveedores")
+}
+
+model Compra {
+  id           Int      @id @default(autoincrement())
+  proveedorId  Int
+  sucursalId   Int
+  employeeId   Int?
+  reference    String?  @db.VarChar(80)
+  status       String   @default("draft") @db.VarChar(24)
+  purchaseDate DateTime @default(now())
+  subtotal     Decimal  @default(0) @db.Decimal(12, 2)
+  tax          Decimal  @default(0) @db.Decimal(12, 2)
+  total        Decimal  @default(0) @db.Decimal(12, 2)
+  notes        String?  @db.VarChar(255)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  proveedor     Proveedor        @relation(fields: [proveedorId], references: [id], onDelete: Restrict)
+  sucursal      Sucursal         @relation(fields: [sucursalId], references: [id], onDelete: Restrict)
+  employee      Employee?        @relation("CompraEmployee", fields: [employeeId], references: [id], onDelete: SetNull)
+  details       DetalleCompra[]
+  cashMovements MovimientoCaja[] @relation("MovimientoCajaCompra")
+
+  @@index([proveedorId, purchaseDate])
+  @@index([sucursalId, purchaseDate])
+  @@index([employeeId])
+  @@index([status, purchaseDate])
+  @@index([reference])
+  @@map("compras")
+}
+
+model DetalleCompra {
+  id          Int      @id @default(autoincrement())
+  compraId    Int
+  productId   Int?
+  productName String   @db.VarChar(160)
+  quantity    Decimal  @db.Decimal(12, 3)
+  unitCost    Decimal  @db.Decimal(12, 2)
+  subtotal    Decimal  @db.Decimal(12, 2)
+  notes       String?  @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  compra  Compra   @relation(fields: [compraId], references: [id], onDelete: Cascade)
+  product Product? @relation("DetalleCompraProduct", fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([compraId])
+  @@index([productId])
+  @@map("detalle_compra")
+}
+
+model Bitacora {
+  id         Int      @id @default(autoincrement())
+  empresaId  Int?
+  sucursalId Int?
+  employeeId Int?
+  module     String   @db.VarChar(80)
+  action     String   @db.VarChar(80)
+  level      String   @default("info") @db.VarChar(24)
+  message    String   @db.VarChar(255)
+  metadata   Json?
+  ipAddress  String?  @db.VarChar(64)
+  userAgent  String?  @db.VarChar(255)
+  createdAt  DateTime @default(now())
+
+  empresa  Empresa?  @relation(fields: [empresaId], references: [id], onDelete: SetNull)
+  sucursal Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+  employee Employee? @relation("BitacoraEmployee", fields: [employeeId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([empresaId, createdAt])
+  @@index([sucursalId, createdAt])
+  @@index([employeeId, createdAt])
+  @@index([module, action])
+  @@map("bitacora")
+}
+
+model Auditoria {
+  id         Int      @id @default(autoincrement())
+  empresaId  Int?
+  sucursalId Int?
+  employeeId Int?
+  entityName String   @db.VarChar(80)
+  entityId   String?  @db.VarChar(80)
+  operation  String   @db.VarChar(32)
+  oldValue   Json?
+  newValue   Json?
+  reason     String?  @db.VarChar(255)
+  requestId  String?  @db.VarChar(80)
+  createdAt  DateTime @default(now())
+
+  empresa  Empresa?  @relation(fields: [empresaId], references: [id], onDelete: SetNull)
+  sucursal Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+  employee Employee? @relation("AuditoriaEmployee", fields: [employeeId], references: [id], onDelete: SetNull)
+
+  @@index([entityName, entityId])
+  @@index([operation, createdAt])
+  @@index([employeeId, createdAt])
+  @@index([empresaId, createdAt])
+  @@index([sucursalId, createdAt])
+  @@map("auditoria")
+}
+
+model Permiso {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique @db.VarChar(120)
+  name        String   @db.VarChar(120)
+  module      String   @db.VarChar(80)
+  action      String   @db.VarChar(80)
+  description String?  @db.VarChar(255)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assignments     EmployeePermission[]
+  roleAssignments RolePermission[]
+
+  @@index([module, action])
+  @@index([isActive])
+  @@map("permisos")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique @db.VarChar(80)
+  name        String   @db.VarChar(120)
+  description String?  @db.VarChar(255)
+  isSystem    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  permissions RolePermission[]
+  employees   EmployeeRole[]
+
+  @@index([isActive])
+  @@map("roles")
+}
+
+model RolePermission {
+  id           Int      @id @default(autoincrement())
+  roleId       Int
+  permissionId Int
+  grantedAt    DateTime @default(now())
+
+  role       Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permiso @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+model EmployeeRole {
+  id                  Int      @id @default(autoincrement())
+  employeeId          Int
+  roleId              Int
+  scopeType           String   @default("global") @db.VarChar(24)
+  empresaId           Int?
+  sucursalId          Int?
+  grantedByEmployeeId Int?
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+
+  employee          Employee  @relation("EmployeeRoleEmployee", fields: [employeeId], references: [id], onDelete: Cascade)
+  role              Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  empresa           Empresa?  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  sucursal          Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
+  grantedByEmployee Employee? @relation("EmployeeRoleGrantedBy", fields: [grantedByEmployeeId], references: [id], onDelete: SetNull)
+
+  @@unique([employeeId, roleId, scopeType, empresaId, sucursalId], name: "uniq_employee_role_scope")
+  @@index([roleId])
+  @@index([empresaId])
+  @@index([sucursalId])
+  @@index([grantedByEmployeeId])
+  @@index([isActive])
+  @@map("employee_roles")
+}
+
+model EmployeePermission {
+  id                  Int      @id @default(autoincrement())
+  employeeId          Int
+  permissionId        Int
+  scopeType           String   @default("global") @db.VarChar(24)
+  empresaId           Int?
+  sucursalId          Int?
+  grantedByEmployeeId Int?
+  createdAt           DateTime @default(now())
+
+  employee          Employee  @relation("EmployeePermissionEmployee", fields: [employeeId], references: [id], onDelete: Cascade)
+  permission        Permiso   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  empresa           Empresa?  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  sucursal          Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: Cascade)
+  grantedByEmployee Employee? @relation("EmployeePermissionGrantedBy", fields: [grantedByEmployeeId], references: [id], onDelete: SetNull)
+
+  @@unique([employeeId, permissionId, scopeType, empresaId, sucursalId], name: "uniq_employee_permission_scope")
+  @@index([permissionId])
+  @@index([empresaId])
+  @@index([sucursalId])
+  @@index([grantedByEmployeeId])
+  @@map("employee_permissions")
 }

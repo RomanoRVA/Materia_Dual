@@ -15,6 +15,11 @@ const initialProducts = [
   { name: 'Orden de Cebollitas', category: 'Extras', price: 28.0 },
 ];
 
+const initialEmployees = [
+  { username: 'admin1', accessCode: '200640', role: 'admin', name: 'Administrador' },
+  { username: 'cajero1', accessCode: '100540', role: 'cashier', name: 'Caja Principal' },
+];
+
 async function main() {
   for (const product of initialProducts) {
     await prisma.product.upsert({
@@ -33,7 +38,27 @@ async function main() {
     });
   }
 
+  for (const employee of initialEmployees) {
+    await prisma.$executeRawUnsafe(
+      `
+      INSERT INTO employees (username, accessCode, role, name, isActive, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, 1, NOW(), NOW())
+      ON DUPLICATE KEY UPDATE
+        accessCode = VALUES(accessCode),
+        role = VALUES(role),
+        name = VALUES(name),
+        isActive = 1,
+        updatedAt = NOW()
+      `,
+      employee.username,
+      employee.accessCode,
+      employee.role,
+      employee.name,
+    );
+  }
+
   console.log(`[seed] Productos iniciales cargados: ${initialProducts.length}`);
+  console.log(`[seed] Empleados iniciales cargados: ${initialEmployees.length}`);
 }
 
 main()

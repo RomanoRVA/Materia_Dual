@@ -43,11 +43,86 @@
         gap: 16px;
       }
 
+      body.waiter-mode {
+        background:
+          linear-gradient(120deg, rgba(41, 20, 15, 0.04), rgba(245, 183, 59, 0.18)),
+          linear-gradient(160deg, #fff9ef 0%, #ffe8ce 54%, #ffd1ad 100%);
+      }
+
+      body.cashier-mode {
+        background:
+          linear-gradient(120deg, rgba(31, 33, 37, 0.08), rgba(207, 63, 47, 0.12)),
+          linear-gradient(160deg, #fffaf2 0%, #ffe0c2 52%, #ffc59f 100%);
+      }
+
+      body.admin-mode {
+        background:
+          linear-gradient(120deg, rgba(41, 20, 15, 0.05), rgba(31, 138, 82, 0.1)),
+          linear-gradient(160deg, #fffaf3 0%, #ffe8cd 48%, #ffd3b3 100%);
+      }
+
+      body.waiter-mode .layout {
+        width: min(1440px, 100%);
+        padding: 14px;
+        gap: 12px;
+      }
+
+      body.cashier-mode .layout {
+        width: min(1380px, 100%);
+        padding: 16px;
+        gap: 14px;
+      }
+
+      body.admin-mode .layout {
+        width: min(1480px, 100%);
+        padding: 18px;
+        gap: 14px;
+      }
+
       .headline {
         background: var(--chipotle);
         color: #fff;
         border-radius: 18px;
         padding: 20px;
+      }
+
+      body.waiter-mode .headline {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 14px 18px;
+        border-radius: 14px;
+      }
+
+      body.waiter-mode .headline h1 {
+        font-size: clamp(2rem, 3vw, 2.8rem);
+      }
+
+      body.cashier-mode .headline {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 16px 20px;
+        border-radius: 14px;
+      }
+
+      body.cashier-mode .headline h1 {
+        font-size: clamp(2.1rem, 3vw, 3rem);
+      }
+
+      body.admin-mode .headline {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+        border-radius: 14px;
+        padding: 16px 20px;
+      }
+
+      body.admin-mode .headline h1 {
+        font-size: clamp(2.1rem, 3vw, 3rem);
       }
 
       .headline h1 {
@@ -73,12 +148,167 @@
         grid-template-columns: 1fr;
       }
 
+      .main-grid.admin-view {
+        grid-template-columns: 1fr;
+      }
+
+      .table-panel {
+        background: #1f2125;
+        border-radius: 18px;
+        border: 1px solid #3a3d42;
+        padding: 16px;
+        color: #f7f7f7;
+      }
+
+      body.waiter-mode .table-panel {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-radius: 14px;
+        padding: 12px;
+        box-shadow: 0 14px 30px rgba(24, 21, 18, 0.18);
+      }
+
+      body.cashier-mode .table-panel {
+        border-radius: 14px;
+        padding: 14px;
+        background: #17191d;
+        box-shadow: 0 14px 30px rgba(24, 21, 18, 0.16);
+      }
+
+      .table-panel h2 {
+        margin: 0 0 10px;
+        color: #f5b73b;
+      }
+
+      .tables-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+        gap: 8px;
+      }
+
+      body.waiter-mode .tables-grid {
+        grid-template-columns: repeat(10, minmax(70px, 1fr));
+        gap: 10px;
+      }
+
+      body.cashier-mode .tables-grid {
+        grid-template-columns: repeat(10, minmax(72px, 1fr));
+        gap: 10px;
+      }
+
+      .table-btn {
+        background: #2cc96f;
+        color: #fff;
+        border-radius: 8px;
+        padding: 10px 8px;
+        font-weight: 700;
+      }
+
+      body.waiter-mode .table-btn {
+        min-height: 58px;
+        display: grid;
+        place-items: center;
+        gap: 2px;
+        padding: 8px;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.14);
+      }
+
+      body.cashier-mode .table-btn {
+        min-height: 62px;
+        display: grid;
+        place-items: center;
+        gap: 2px;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.16);
+      }
+
+      .table-btn small {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 700;
+        opacity: 0.92;
+        line-height: 1.1;
+      }
+
+      .table-btn.free {
+        background: #2cc96f;
+      }
+
+      .table-btn.occupied {
+        background: #e55252;
+      }
+
+      .table-btn.active {
+        background: #2685ff;
+      }
+
+      body.waiter-mode .table-btn.active {
+        outline: 3px solid #fff;
+        outline-offset: -6px;
+      }
+
+      body.cashier-mode .table-btn.active {
+        outline: 3px solid #fff;
+        outline-offset: -6px;
+      }
+
+      .table-legend {
+        margin-bottom: 8px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 0.82rem;
+      }
+
+      .table-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .legend-free {
+        background: #2cc96f;
+      }
+
+      .legend-occupied {
+        background: #e55252;
+      }
+
+      .legend-active {
+        background: #2685ff;
+      }
+
+      .table-meta {
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+      }
+
       .panel {
         background: var(--card);
         border-radius: 18px;
         border: 1px solid #f5d8c0;
         padding: 18px;
         box-shadow: 0 10px 26px rgba(82, 37, 20, 0.12);
+      }
+
+      body.waiter-mode .panel {
+        border-radius: 14px;
+        padding: 14px;
+      }
+
+      body.cashier-mode .panel {
+        border-radius: 14px;
+        padding: 16px;
       }
 
       .panel h2 {
@@ -107,6 +337,13 @@
         border: 1px solid #d6b39a;
       }
 
+      button.print-arrow {
+        background: #2685ff;
+        color: #fff;
+        border: 1px solid #1f6fd3;
+        min-width: 52px;
+      }
+
       .status {
         margin-top: 8px;
         font-size: 0.9rem;
@@ -126,11 +363,67 @@
         gap: 10px;
       }
 
+      body.waiter-mode .catalog {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 8px;
+      }
+
+      body.cashier-mode .catalog {
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 8px;
+      }
+
       .product {
         border: 1px solid #f0d8c5;
         border-radius: 12px;
         padding: 12px;
         background: #fffcf8;
+      }
+
+      body.waiter-mode .product {
+        min-height: 132px;
+        display: grid;
+        align-content: space-between;
+        gap: 8px;
+        border-radius: 10px;
+      }
+
+      body.cashier-mode .product {
+        min-height: 126px;
+        display: grid;
+        align-content: space-between;
+        gap: 8px;
+        border-radius: 10px;
+      }
+
+      body.waiter-mode .product button {
+        min-height: 44px;
+        width: 100%;
+      }
+
+      body.cashier-mode .product button {
+        min-height: 42px;
+        width: 100%;
+      }
+
+      .product-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .cart-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 30px;
+        height: 26px;
+        border-radius: 999px;
+        background: var(--chipotle);
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 700;
       }
 
       .product h3 {
@@ -160,11 +453,66 @@
         font-size: 0.9rem;
       }
 
+      body.waiter-mode #orderPanel {
+        position: sticky;
+        top: 156px;
+        align-self: start;
+      }
+
+      body.cashier-mode #orderPanel {
+        position: sticky;
+        top: 14px;
+        align-self: start;
+        border: 2px solid #efc09a;
+      }
+
+      body.cashier-mode #orderPanelTitle {
+        font-size: 1.25rem;
+      }
+
+      body.waiter-mode .cart-table td,
+      body.waiter-mode .cart-table th {
+        font-size: 0.95rem;
+        padding: 10px 8px;
+      }
+
+      body.cashier-mode .cart-table td,
+      body.cashier-mode .cart-table th {
+        font-size: 0.98rem;
+        padding: 10px 8px;
+      }
+
+      body.cashier-mode #cartTotal {
+        font-size: 1.7rem;
+        color: var(--tomato);
+      }
+
       .actions {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         margin-top: 10px;
+      }
+
+      body.waiter-mode .actions button {
+        min-height: 44px;
+      }
+
+      body.cashier-mode .actions button {
+        min-height: 44px;
+      }
+
+      body.cashier-mode #payOrderBtn {
+        background: #1f8a52;
+        border: 1px solid #176a3f;
+        color: #fff;
+        font-size: 1rem;
+        min-height: 52px;
+        flex: 1 1 220px;
+      }
+
+      body.cashier-mode #printCustomerTicketBtn {
+        flex: 1 1 180px;
       }
 
       .kpi {
@@ -186,9 +534,156 @@
       }
 
       .admin-panel {
+        display: grid;
+        gap: 14px;
         margin-top: 14px;
-        border-top: 1px dashed #e6cbb5;
-        padding-top: 12px;
+      }
+
+      .admin-dashboard .admin-panel {
+        margin-top: 0;
+      }
+
+      body.admin-mode #catalogPanel {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .admin-hero {
+        border: 1px solid #ebd1bb;
+        border-radius: 14px;
+        padding: 18px;
+        background:
+          linear-gradient(120deg, rgba(41, 20, 15, 0.92), rgba(63, 49, 44, 0.96)),
+          #29140f;
+        color: #fff;
+        box-shadow: 0 14px 32px rgba(66, 31, 18, 0.18);
+      }
+
+      .admin-hero h2 {
+        margin: 4px 0 6px;
+        color: #f5b73b;
+        font-size: clamp(1.7rem, 3vw, 2.35rem);
+      }
+
+      .admin-hero p {
+        max-width: 780px;
+        margin: 0;
+        color: #f8e9d7;
+      }
+
+      .admin-eyebrow {
+        display: inline-flex;
+        width: fit-content;
+        border: 1px solid rgba(245, 183, 59, 0.45);
+        border-radius: 999px;
+        padding: 4px 10px;
+        color: #f5d186;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .admin-kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .admin-kpis span {
+        display: grid;
+        gap: 2px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 10px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.07);
+      }
+
+      .admin-kpis strong {
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .admin-kpis small {
+        color: #f2dbc7;
+      }
+
+      .admin-toolbar {
+        position: sticky;
+        top: 10px;
+        z-index: 15;
+        border: 1px solid #ecd4c0;
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(255, 253, 250, 0.94);
+        box-shadow: 0 10px 24px rgba(82, 37, 20, 0.1);
+      }
+
+      .admin-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 8px;
+      }
+
+      .admin-overview a {
+        display: grid;
+        gap: 2px;
+        border: 1px solid #ecd4c0;
+        border-radius: 10px;
+        padding: 10px;
+        background: #fffdfa;
+        color: var(--chipotle);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .admin-overview a:hover {
+        border-color: #cf3f2f;
+        box-shadow: 0 8px 18px rgba(207, 63, 47, 0.12);
+        transform: translateY(-1px);
+      }
+
+      .admin-overview small {
+        color: #7a6257;
+        font-weight: 500;
+      }
+
+      .admin-section {
+        border: 1px solid #efd8c5;
+        border-radius: 14px;
+        padding: 16px;
+        background: rgba(255, 253, 249, 0.96);
+        box-shadow: 0 10px 24px rgba(82, 37, 20, 0.08);
+      }
+
+      .admin-section h2,
+      .admin-section h3 {
+        margin: 0 0 10px;
+        color: var(--chipotle);
+      }
+
+      .admin-section h2 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.18rem;
+      }
+
+      .admin-section > p {
+        margin: -4px 0 12px;
+        color: #6d554a;
+      }
+
+      .admin-subsection {
+        margin-top: 12px;
+        border: 1px solid #f1dccb;
+        border-radius: 12px;
+        padding: 12px;
+        background: #fffaf5;
       }
 
       .admin-form {
@@ -197,29 +692,324 @@
         grid-template-columns: 1fr;
       }
 
-      .admin-form input {
+      .admin-form input,
+      .admin-form select,
+      .admin-form textarea {
         width: 100%;
         border: 1px solid #e7c9b0;
         border-radius: 10px;
         padding: 10px;
+        font-family: inherit;
+      }
+
+      .admin-form textarea {
+        min-height: 72px;
+        resize: vertical;
+      }
+
+      .admin-form button {
+        min-height: 42px;
       }
 
       .admin-products {
         margin-top: 10px;
         display: grid;
-        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 10px;
       }
 
       .admin-products article {
         border: 1px solid #efd8c5;
-        border-radius: 10px;
-        padding: 8px;
+        border-radius: 12px;
+        padding: 12px;
         background: #fffdf9;
+      }
+
+      .admin-products .actions {
+        align-items: stretch;
+      }
+
+      .admin-products .actions input {
+        flex: 1 1 150px;
+        min-width: 0;
+        border: 1px solid #e7c9b0;
+        border-radius: 10px;
+        padding: 9px;
+      }
+
+      .admin-products .actions button {
+        flex: 1 1 150px;
+      }
+
+      .admin-card-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .admin-card-title strong {
+        color: var(--chipotle);
+      }
+
+      .admin-card-meta {
+        color: #765f54;
+        font-size: 0.88rem;
+      }
+
+      .admin-badge {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        border-radius: 999px;
+        padding: 3px 8px;
+        background: #ffe4bf;
+        color: #7a4b16;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .admin-badge.ok {
+        background: #dff6e9;
+        color: #176a3f;
+      }
+
+      .admin-badge.warn {
+        background: #ffe1dc;
+        color: #a73429;
+      }
+
+      .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+        font-size: 0.9rem;
+      }
+
+      .admin-table th,
+      .admin-table td {
+        border-bottom: 1px solid #f0ddcc;
+        padding: 8px;
+        text-align: left;
+      }
+
+      .admin-table th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #fff6ec;
+        color: #533227;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+      }
+
+      .admin-table tbody tr:hover {
+        background: #fffaf5;
+      }
+
+      .admin-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #f0ddcc;
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .admin-table-wrap .admin-table {
+        margin-top: 0;
+      }
+
+      .admin-table input {
+        width: 110px;
+        border: 1px solid #e7c9b0;
+        border-radius: 9px;
+        padding: 8px;
+        font-family: inherit;
+      }
+
+      .admin-inline {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .admin-inline input,
+      .admin-inline select {
+        width: auto;
+        min-width: 150px;
+        border: 1px solid #e7c9b0;
+        border-radius: 10px;
+        padding: 9px;
+        font-family: inherit;
+      }
+
+      .permission-list {
+        display: grid;
+        gap: 6px;
+        margin-top: 8px;
+        border: 1px dashed #e5c7ad;
+        border-radius: 12px;
+        padding: 10px;
+        background: #fffaf5;
+      }
+
+      .permission-chip {
+        display: inline-flex;
+        width: fit-content;
+        border: 1px solid #ecd4c0;
+        border-radius: 999px;
+        padding: 5px 9px;
+        background: #fffdfa;
+        font-size: 0.85rem;
+      }
+
+      @media (min-width: 860px) {
+        .admin-form {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          align-items: end;
+        }
+
+        .admin-form button {
+          width: 100%;
+        }
+
+        #adminProductsSection .admin-form,
+        #adminEmployeesSection .admin-form {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+      }
+
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(20, 12, 8, 0.52);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+        padding: 16px;
+      }
+
+      .modal-backdrop.open {
+        display: flex;
+      }
+
+      .modal-card {
+        width: min(420px, 100%);
+        background: #fff;
+        border: 1px solid #edceb3;
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 12px 30px rgba(66, 31, 18, 0.25);
+      }
+
+      .modal-card h3 {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+      }
+
+      .modal-field {
+        display: grid;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+
+      .modal-field input,
+      .modal-field select {
+        width: 100%;
+        border: 1px solid #e6c7af;
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 1rem;
+        font-family: inherit;
+      }
+
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .modal-help {
+        font-size: 0.9rem;
+        color: #60453b;
+      }
+
+      .quick-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: 6px;
+      }
+
+      .quick-row button {
+        padding: 8px 6px;
+        font-size: 0.9rem;
+      }
+
+      .payment-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        align-items: start;
+      }
+
+      .numpad-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .numpad-grid button {
+        padding: 10px;
+      }
+
+      .amount-box {
+        width: 100%;
+        border: 1px solid #e6c7af;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: right;
+        font-size: 1.05rem;
+        font-weight: 700;
+        background: #fffdf9;
+      }
+
+      .muted {
+        opacity: 0.65;
       }
 
       @media (min-width: 980px) {
         .main-grid {
           grid-template-columns: 1.2fr 1fr;
+        }
+
+        body.waiter-mode .main-grid {
+          grid-template-columns: minmax(0, 1.25fr) minmax(340px, 0.75fr);
+          align-items: start;
+        }
+
+        body.cashier-mode .main-grid {
+          grid-template-columns: minmax(0, 0.95fr) minmax(380px, 1.05fr);
+          align-items: start;
+        }
+      }
+
+      @media (max-width: 760px) {
+        body.waiter-mode .tables-grid {
+          grid-template-columns: repeat(5, minmax(54px, 1fr));
+        }
+
+        body.cashier-mode .tables-grid {
+          grid-template-columns: repeat(5, minmax(54px, 1fr));
+        }
+
+        body.waiter-mode #orderPanel,
+        body.cashier-mode #orderPanel {
+          position: static;
         }
       }
     </style>
@@ -234,13 +1024,52 @@
         </div>
       </header>
 
-      <div class="main-grid">
-        <section class="panel">
-          <h2>Catalogo visual</h2>
+      <section class="table-panel" id="cashierTablesPanel" style="display: none">
+        <h2>Seleccion de mesa</h2>
+        <div id="tableMeta" class="table-meta">Selecciona una mesa para empezar.</div>
+        <div class="table-legend">
+          <span><i class="legend-dot legend-free"></i> Libre</span>
+          <span><i class="legend-dot legend-occupied"></i> Ocupada</span>
+          <span><i class="legend-dot legend-active"></i> Activa</span>
+        </div>
+        <div id="tableGrid" class="tables-grid"></div>
+        <div class="actions">
+          <button id="leaveTableBtn" class="secondary">Salir de mesa actual</button>
+        </div>
+        <div id="tableStatus" class="status">Panel de mesas listo.</div>
+      </section>
+
+      <div class="main-grid" id="mainGrid">
+        <section class="panel" id="catalogPanel">
+          <h2 id="catalogTitle">Catalogo visual</h2>
           <div id="catalog" class="catalog"></div>
 
           <div id="adminPanel" class="admin-panel" style="display: none">
-            <h2>Gestion de productos (admin)</h2>
+            <div class="admin-hero">
+              <span class="admin-eyebrow">Administrador</span>
+              <h2>Centro de control</h2>
+              <p>Gestiona catalogo, inventario, usuarios, permisos, sesiones, cuentas pagadas y corte del dia desde un solo panel.</p>
+              <div class="admin-kpis">
+                <span><strong>Operacion</strong><small>Productos, precios e inventario</small></span>
+                <span><strong>Seguridad</strong><small>Usuarios, roles y sesiones</small></span>
+                <span><strong>Caja</strong><small>Cuentas pagadas y corte diario</small></span>
+              </div>
+            </div>
+            <div class="admin-toolbar">
+              <div class="admin-overview">
+                <a href="#adminProductsSection">Productos<small>Precios y catalogo</small></a>
+                <a href="#adminInventorySection">Inventario<small>Entradas y ajustes</small></a>
+                <a href="#adminEmployeesSection">Usuarios<small>Altas y bajas</small></a>
+                <a href="#adminSecuritySection">Permisos<small>Roles granulares</small></a>
+                <a href="#adminSessionsSection">Sesiones<small>Dispositivos activos</small></a>
+                <a href="#adminPaidAccountsSection">Cuentas<small>Referencias pagadas</small></a>
+                <a href="#adminCutoffSection">Corte<small>Cierre del dia</small></a>
+              </div>
+            </div>
+
+            <div class="admin-section" id="adminProductsSection">
+            <h2>Gestion de productos</h2>
+            <p>Alta de productos, cambio de precios y control de productos activos del catalogo.</p>
             <div class="admin-form">
               <input id="newProductName" type="text" placeholder="Nombre del producto" />
               <input id="newProductCategory" type="text" placeholder="Categoria" />
@@ -249,11 +1078,191 @@
             </div>
             <div id="adminStatus" class="status">Panel inactivo.</div>
             <div id="adminProducts" class="admin-products"></div>
+            </div>
+
+            <div class="admin-section" id="adminInventorySection">
+            <h2>Inventario profesional</h2>
+            <p>Registra entradas, salidas, mermas, transferencias y existencias minimas.</p>
+            <div class="admin-form">
+              <select id="inventoryEntryProduct"></select>
+              <input id="inventoryEntryQuantity" type="number" min="0.001" step="0.001" placeholder="Cantidad de entrada" />
+              <input id="inventoryEntryUnitCost" type="number" min="0.01" step="0.01" placeholder="Costo unitario" />
+              <input id="inventoryEntryMinStock" type="number" min="0" step="0.001" placeholder="Stock minimo opcional" />
+              <input id="inventoryEntryLocation" type="text" placeholder="Ubicacion (global, almacen, barra)" />
+              <button id="addInventoryEntryBtn" class="secondary">Registrar entrada</button>
+            </div>
+            <div class="admin-subsection">
+              <h3>Salidas, ajustes y merma</h3>
+              <div class="admin-form">
+                <select id="inventoryMovementProduct"></select>
+                <select id="inventoryMovementType">
+                  <option value="salida">Salida</option>
+                  <option value="merma">Merma</option>
+                  <option value="ajuste">Ajuste</option>
+                </select>
+                <input id="inventoryMovementQuantity" type="number" min="0.001" step="0.001" placeholder="Cantidad para salida/merma" />
+                <input id="inventoryAdjustmentQuantity" type="number" step="0.001" placeholder="Nueva existencia para ajuste" />
+                <input id="inventoryMovementLocation" type="text" placeholder="Ubicacion" />
+                <input id="inventoryMovementReason" type="text" placeholder="Motivo" />
+                <button id="runInventoryMovementBtn" class="secondary">Registrar movimiento</button>
+              </div>
+            </div>
+            <div class="admin-subsection">
+              <h3>Transferencias</h3>
+              <div class="admin-form">
+                <select id="inventoryTransferProduct"></select>
+                <input id="inventoryTransferQuantity" type="number" min="0.001" step="0.001" placeholder="Cantidad a transferir" />
+                <input id="inventoryTransferFrom" type="text" placeholder="Origen" />
+                <input id="inventoryTransferTo" type="text" placeholder="Destino" />
+                <button id="runInventoryTransferBtn" class="secondary">Transferir</button>
+              </div>
+            </div>
+            <button id="refreshInventoryBtn" class="secondary">Actualizar inventario</button>
+            <div id="inventoryStatus" class="status">Sin inventario cargado.</div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Ubicacion</th>
+                    <th>Existencia</th>
+                    <th>Costo prom.</th>
+                    <th>Ultimo costo</th>
+                    <th>Minimo</th>
+                    <th>Accion</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryStocksBody"></tbody>
+              </table>
+            </div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Costo</th>
+                    <th>Referencia</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryMovementsBody"></tbody>
+              </table>
+            </div>
+            <div id="inventoryAlerts" class="admin-products"></div>
+            </div>
+
+            <div class="admin-section" id="adminEmployeesSection">
+            <h2>Alta de empleados</h2>
+            <p>Registra usuarios operativos sin modificar empleados existentes.</p>
+            <div class="admin-form">
+              <input id="newEmployeeName" type="text" placeholder="Nombre completo" />
+              <input id="newEmployeeUsername" type="text" placeholder="Usuario" />
+              <select id="newEmployeeRole">
+                <option value="cashier">Cajero</option>
+                <option value="waiter">Mesero</option>
+                <option value="kitchen">Cocina</option>
+              </select>
+              <input id="newEmployeeCode" type="number" min="1000" max="99999999" placeholder="Codigo de acceso" />
+              <button id="addEmployeeBtn" class="secondary">Agregar empleado</button>
+            </div>
+            <div id="employeeStatus" class="status">Sin cambios en empleados.</div>
+            <div id="employeeList" class="admin-products"></div>
+            </div>
+
+            <div class="admin-section" id="adminSecuritySection">
+            <h2>Roles y permisos granulares</h2>
+            <p>Administra permisos heredados por rol y permisos directos por usuario.</p>
+            <button id="refreshSecurityBtn" class="secondary">Actualizar seguridad</button>
+            <div id="securityStatus" class="status">Sin permisos cargados.</div>
+            <div class="admin-form">
+              <select id="securityEmployeeSelect"></select>
+              <select id="securityRoleSelect"></select>
+              <button id="assignRoleBtn" class="secondary">Asignar rol heredado</button>
+              <select id="securityPermissionSelect"></select>
+              <button id="assignPermissionBtn" class="secondary">Asignar permiso directo</button>
+            </div>
+            <div id="selectedEmployeePermissions" class="permission-list"></div>
+            <div id="securityRolesList" class="admin-products"></div>
+            </div>
+
+            <div class="admin-section" id="adminSessionsSection">
+            <h2>Sesiones activas y dispositivos</h2>
+            <p>Revisa dispositivos conectados y cierra sesiones remotas cuando sea necesario.</p>
+            <button id="refreshSessionsBtn" class="secondary">Actualizar sesiones</button>
+            <div id="sessionsStatus" class="status">Sin sesiones cargadas.</div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Usuario</th>
+                    <th>Dispositivo</th>
+                    <th>IP</th>
+                    <th>Estado</th>
+                    <th>Ultimo uso</th>
+                    <th>Accion</th>
+                  </tr>
+                </thead>
+                <tbody id="sessionsTableBody"></tbody>
+              </table>
+            </div>
+            </div>
+
+            <div class="admin-section" id="adminPaidAccountsSection">
+            <h2>Todas las cuentas pagadas</h2>
+            <p>Consulta ventas pagadas con referencia, orden, metodo de pago y corte relacionado.</p>
+            <button id="refreshPaidAccountsBtn" class="secondary">Actualizar cuentas pagadas</button>
+            <div id="paidAccountsStatus" class="status">Sin cuentas pagadas cargadas.</div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Referencia</th>
+                    <th>Orden</th>
+                    <th>Total</th>
+                    <th>Metodo</th>
+                    <th>Fecha/Hora</th>
+                    <th>Corte</th>
+                  </tr>
+                </thead>
+                <tbody id="paidAccountsTableBody"></tbody>
+              </table>
+            </div>
+            </div>
+
+            <div class="admin-section" id="adminSalesSection">
+            <h2>Resumen del dia abierto</h2>
+            <p>Monitorea el comportamiento de ventas pagadas antes de ejecutar el corte.</p>
+            <button id="refreshSalesBtn" class="secondary">Actualizar resumen</button>
+            <div id="salesStatus" class="status">Sin datos de ventas.</div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Ordenes pagadas</th>
+                    <th>Venta total</th>
+                    <th>Ticket promedio</th>
+                  </tr>
+                </thead>
+                <tbody id="salesTableBody"></tbody>
+              </table>
+            </div>
+            </div>
+
+            <div class="admin-section" id="adminCutoffSection">
+            <h2>Corte de caja del dia</h2>
+            <p>Genera la referencia de cierre para terminar el dia operativo y comenzar uno nuevo.</p>
+            <button id="runCutoffBtn" class="secondary">Realizar corte y empezar nuevo dia</button>
+            <div id="cutoffStatus" class="status">Sin corte ejecutado.</div>
+            </div>
           </div>
         </section>
 
-        <section class="panel">
-          <h2>Orden actual</h2>
+        <section class="panel" id="orderPanel">
+          <h2 id="orderPanelTitle">Orden actual</h2>
+          <p id="tableContext" class="status">Sin mesa seleccionada.</p>
           <table class="cart-table">
             <thead>
               <tr>
@@ -272,30 +1281,91 @@
             <button id="sendKitchenBtn" class="secondary">Enviar a cocina</button>
             <button id="readyBtn" class="secondary">Marcar lista</button>
             <button id="deliverBtn" class="secondary">Marcar entregada</button>
+            <button id="printOrderBtn" class="print-arrow" title="Enviar pedido a impresion">⬆</button>
+            <button id="printCustomerTicketBtn" class="secondary">Imprimir ticket cliente</button>
+            <button id="payOrderBtn" class="secondary">Cobrar e imprimir ticket</button>
           </div>
           <div id="orderStatus" class="status">No hay orden activa.</div>
+        </section>
+      </div>
+    </div>
 
-          <h2>Telemetria</h2>
-          <div class="kpi">
-            <div class="kpi-item">
-              <span>Ordenes</span>
-              <strong id="kpiOrders">0</strong>
+    <div id="tableModal" class="modal-backdrop" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="tableModalTitle">
+        <h3 id="tableModalTitle">Abrir mesa</h3>
+        <p class="modal-help" id="tableModalSubtitle">Mesa seleccionada</p>
+        <div class="modal-field" id="tableNumberField" style="display: none">
+          <label for="tableNumberInput">Numero de mesa</label>
+          <input id="tableNumberInput" type="number" min="1" max="10" step="1" placeholder="Ejemplo: 3" />
+        </div>
+        <div class="modal-field">
+          <label for="tableGuestCountInput">Numero de personas</label>
+          <input id="tableGuestCountInput" type="number" min="1" max="30" step="1" placeholder="Ejemplo: 3" />
+          <div class="quick-row" id="tableGuestQuickRow">
+            <button type="button" class="secondary" data-guests="1">1</button>
+            <button type="button" class="secondary" data-guests="2">2</button>
+            <button type="button" class="secondary" data-guests="4">4</button>
+            <button type="button" class="secondary" data-guests="6">6</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="secondary" id="tableModalCancelBtn">Cancelar</button>
+          <button type="button" id="tableModalConfirmBtn">Entrar a mesa</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="paymentModal" class="modal-backdrop" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
+        <h3 id="paymentModalTitle">Cobrar orden</h3>
+        <p class="modal-help" id="paymentTotalText">Total: $0.00</p>
+        <div class="modal-field">
+          <label for="paymentMethodSelect">Metodo de pago</label>
+          <select id="paymentMethodSelect">
+            <option value="efectivo">Efectivo</option>
+            <option value="tarjeta">Tarjeta</option>
+          </select>
+        </div>
+        <div class="modal-field" id="amountReceivedField">
+          <label for="amountReceivedInput">Billete o monto recibido</label>
+          <input id="amountReceivedInput" type="number" min="0" step="0.01" />
+          <div class="quick-row" id="quickCashRow">
+            <button type="button" class="secondary" data-cash="50">$50</button>
+            <button type="button" class="secondary" data-cash="100">$100</button>
+            <button type="button" class="secondary" data-cash="200">$200</button>
+            <button type="button" class="secondary" data-cash="500">$500</button>
+          </div>
+          <div class="quick-row" id="cashActionsRow">
+            <button type="button" class="secondary" id="payExactBtn">Pago exacto</button>
+            <button type="button" class="secondary" id="clearAmountBtn">Limpiar</button>
+            <button type="button" class="secondary" id="backspaceAmountBtn">Borrar</button>
+          </div>
+          <div class="payment-grid" id="paymentGrid">
+            <div class="numpad-grid" id="paymentNumpad">
+              <button type="button" class="secondary" data-key="1">1</button>
+              <button type="button" class="secondary" data-key="2">2</button>
+              <button type="button" class="secondary" data-key="3">3</button>
+              <button type="button" class="secondary" data-key="4">4</button>
+              <button type="button" class="secondary" data-key="5">5</button>
+              <button type="button" class="secondary" data-key="6">6</button>
+              <button type="button" class="secondary" data-key="7">7</button>
+              <button type="button" class="secondary" data-key="8">8</button>
+              <button type="button" class="secondary" data-key="9">9</button>
+              <button type="button" class="secondary" data-key="00">00</button>
+              <button type="button" class="secondary" data-key="0">0</button>
+              <button type="button" class="secondary" data-key=".">.</button>
             </div>
-            <div class="kpi-item">
-              <span>Entregadas</span>
-              <strong id="kpiDelivered">0</strong>
-            </div>
-            <div class="kpi-item">
-              <span>Eventos</span>
-              <strong id="kpiEvents">0</strong>
-            </div>
-            <div class="kpi-item">
-              <span>Tiempo prom.</span>
-              <strong><span id="kpiAvg">0</span>s</strong>
+            <div>
+              <div class="amount-box" id="amountPreview">$0.00</div>
+              <p class="modal-help" style="margin-top: 8px">Usa teclas o billetes rapidos.</p>
             </div>
           </div>
-          <button id="refreshTelemetryBtn" class="secondary">Actualizar metricas</button>
-        </section>
+        </div>
+        <p class="modal-help" id="paymentChangeText">Cambio: $0.00</p>
+        <div class="modal-actions">
+          <button type="button" class="secondary" id="paymentModalCancelBtn">Cancelar</button>
+          <button type="button" id="paymentModalConfirmBtn">Confirmar cobro</button>
+        </div>
       </div>
     </div>
 
@@ -315,17 +1385,58 @@
         window.location.href = './login.html';
       }
 
+      if (!session?.user || !session.user.role || !Number.isInteger(Number(session.user.id))) {
+        localStorage.removeItem('posSession');
+        window.location.href = './login.html';
+      }
+
+      const TABLES_STORAGE_KEY = 'posTablesState:v2:shared';
+
       const state = {
         token: session?.token || null,
-        user: session?.user || null,
+        user: {
+          ...(session?.user || {}),
+          id: Number(session?.user?.id),
+        },
+        refreshToken: session?.refreshToken || null,
+        expiresAt: session?.expiresAt || null,
+        refreshExpiresAt: session?.refreshExpiresAt || null,
+        sessionId: Number(session?.sessionId || 0) || null,
         products: [],
+        employees: [],
+        inventoryStocks: [],
+        inventoryMovements: [],
+        inventoryAlerts: [],
+        securityRoles: [],
+        securityPermissions: [],
+        authSessions: [],
         cart: [],
         lastOrderId: null,
+        selectedTable: null,
+        guestCount: null,
+        totalTables: 10,
+        tableStates: {},
+        tableDrafts: {},
+        waiterTableOwners: {},
+        remoteOpenOrdersByTable: {},
+        remoteTableAccountsByTable: {},
+        printOrderInFlight: false,
+        lastPrintFingerprint: null,
+        lastPrintAtMs: 0,
       };
 
       const refs = {
         sessionInfo: document.getElementById('sessionInfo'),
         logoutBtn: document.getElementById('logoutBtn'),
+        cashierTablesPanel: document.getElementById('cashierTablesPanel'),
+        tableMeta: document.getElementById('tableMeta'),
+        tableGrid: document.getElementById('tableGrid'),
+        leaveTableBtn: document.getElementById('leaveTableBtn'),
+        tableStatus: document.getElementById('tableStatus'),
+        mainGrid: document.getElementById('mainGrid'),
+        catalogPanel: document.getElementById('catalogPanel'),
+        orderPanel: document.getElementById('orderPanel'),
+        catalogTitle: document.getElementById('catalogTitle'),
         catalog: document.getElementById('catalog'),
         adminPanel: document.getElementById('adminPanel'),
         newProductName: document.getElementById('newProductName'),
@@ -334,19 +1445,106 @@
         addProductBtn: document.getElementById('addProductBtn'),
         adminStatus: document.getElementById('adminStatus'),
         adminProducts: document.getElementById('adminProducts'),
+        inventoryEntryProduct: document.getElementById('inventoryEntryProduct'),
+        inventoryEntryQuantity: document.getElementById('inventoryEntryQuantity'),
+        inventoryEntryUnitCost: document.getElementById('inventoryEntryUnitCost'),
+        inventoryEntryMinStock: document.getElementById('inventoryEntryMinStock'),
+        inventoryEntryLocation: document.getElementById('inventoryEntryLocation'),
+        addInventoryEntryBtn: document.getElementById('addInventoryEntryBtn'),
+        inventoryMovementProduct: document.getElementById('inventoryMovementProduct'),
+        inventoryMovementType: document.getElementById('inventoryMovementType'),
+        inventoryMovementQuantity: document.getElementById('inventoryMovementQuantity'),
+        inventoryAdjustmentQuantity: document.getElementById('inventoryAdjustmentQuantity'),
+        inventoryMovementLocation: document.getElementById('inventoryMovementLocation'),
+        inventoryMovementReason: document.getElementById('inventoryMovementReason'),
+        runInventoryMovementBtn: document.getElementById('runInventoryMovementBtn'),
+        inventoryTransferProduct: document.getElementById('inventoryTransferProduct'),
+        inventoryTransferQuantity: document.getElementById('inventoryTransferQuantity'),
+        inventoryTransferFrom: document.getElementById('inventoryTransferFrom'),
+        inventoryTransferTo: document.getElementById('inventoryTransferTo'),
+        runInventoryTransferBtn: document.getElementById('runInventoryTransferBtn'),
+        refreshInventoryBtn: document.getElementById('refreshInventoryBtn'),
+        inventoryStatus: document.getElementById('inventoryStatus'),
+        inventoryStocksBody: document.getElementById('inventoryStocksBody'),
+        inventoryMovementsBody: document.getElementById('inventoryMovementsBody'),
+        inventoryAlerts: document.getElementById('inventoryAlerts'),
+        newEmployeeName: document.getElementById('newEmployeeName'),
+        newEmployeeUsername: document.getElementById('newEmployeeUsername'),
+        newEmployeeRole: document.getElementById('newEmployeeRole'),
+        newEmployeeCode: document.getElementById('newEmployeeCode'),
+        addEmployeeBtn: document.getElementById('addEmployeeBtn'),
+        employeeStatus: document.getElementById('employeeStatus'),
+        employeeList: document.getElementById('employeeList'),
+        refreshSecurityBtn: document.getElementById('refreshSecurityBtn'),
+        securityStatus: document.getElementById('securityStatus'),
+        securityEmployeeSelect: document.getElementById('securityEmployeeSelect'),
+        securityRoleSelect: document.getElementById('securityRoleSelect'),
+        assignRoleBtn: document.getElementById('assignRoleBtn'),
+        securityPermissionSelect: document.getElementById('securityPermissionSelect'),
+        assignPermissionBtn: document.getElementById('assignPermissionBtn'),
+        selectedEmployeePermissions: document.getElementById('selectedEmployeePermissions'),
+        securityRolesList: document.getElementById('securityRolesList'),
+        refreshSessionsBtn: document.getElementById('refreshSessionsBtn'),
+        sessionsStatus: document.getElementById('sessionsStatus'),
+        sessionsTableBody: document.getElementById('sessionsTableBody'),
+        refreshPaidAccountsBtn: document.getElementById('refreshPaidAccountsBtn'),
+        paidAccountsStatus: document.getElementById('paidAccountsStatus'),
+        paidAccountsTableBody: document.getElementById('paidAccountsTableBody'),
+        refreshSalesBtn: document.getElementById('refreshSalesBtn'),
+        salesStatus: document.getElementById('salesStatus'),
+        salesTableBody: document.getElementById('salesTableBody'),
+        runCutoffBtn: document.getElementById('runCutoffBtn'),
+        cutoffStatus: document.getElementById('cutoffStatus'),
         cartBody: document.getElementById('cartBody'),
         cartTotal: document.getElementById('cartTotal'),
         createOrderBtn: document.getElementById('createOrderBtn'),
         sendKitchenBtn: document.getElementById('sendKitchenBtn'),
         readyBtn: document.getElementById('readyBtn'),
         deliverBtn: document.getElementById('deliverBtn'),
+        printOrderBtn: document.getElementById('printOrderBtn'),
+        printCustomerTicketBtn: document.getElementById('printCustomerTicketBtn'),
+        payOrderBtn: document.getElementById('payOrderBtn'),
+        tableContext: document.getElementById('tableContext'),
+        orderPanelTitle: document.getElementById('orderPanelTitle'),
         orderStatus: document.getElementById('orderStatus'),
-        kpiOrders: document.getElementById('kpiOrders'),
-        kpiDelivered: document.getElementById('kpiDelivered'),
-        kpiEvents: document.getElementById('kpiEvents'),
-        kpiAvg: document.getElementById('kpiAvg'),
-        refreshTelemetryBtn: document.getElementById('refreshTelemetryBtn'),
+        tableModal: document.getElementById('tableModal'),
+        tableModalTitle: document.getElementById('tableModalTitle'),
+        tableModalSubtitle: document.getElementById('tableModalSubtitle'),
+        tableNumberField: document.getElementById('tableNumberField'),
+        tableNumberInput: document.getElementById('tableNumberInput'),
+        tableGuestCountInput: document.getElementById('tableGuestCountInput'),
+        tableGuestQuickRow: document.getElementById('tableGuestQuickRow'),
+        tableModalCancelBtn: document.getElementById('tableModalCancelBtn'),
+        tableModalConfirmBtn: document.getElementById('tableModalConfirmBtn'),
+        paymentModal: document.getElementById('paymentModal'),
+        paymentTotalText: document.getElementById('paymentTotalText'),
+        paymentMethodSelect: document.getElementById('paymentMethodSelect'),
+        amountReceivedField: document.getElementById('amountReceivedField'),
+        amountReceivedInput: document.getElementById('amountReceivedInput'),
+        quickCashRow: document.getElementById('quickCashRow'),
+        cashActionsRow: document.getElementById('cashActionsRow'),
+        payExactBtn: document.getElementById('payExactBtn'),
+        clearAmountBtn: document.getElementById('clearAmountBtn'),
+        backspaceAmountBtn: document.getElementById('backspaceAmountBtn'),
+        paymentNumpad: document.getElementById('paymentNumpad'),
+        amountPreview: document.getElementById('amountPreview'),
+        paymentChangeText: document.getElementById('paymentChangeText'),
+        paymentModalCancelBtn: document.getElementById('paymentModalCancelBtn'),
+        paymentModalConfirmBtn: document.getElementById('paymentModalConfirmBtn'),
       };
+
+      const modalState = {
+        tableResolver: null,
+        paymentResolver: null,
+      };
+
+      const tableAccountSyncState = {
+        timerId: null,
+      };
+
+      function isTablePanelRole(role = state.user?.role) {
+        return ['cashier', 'waiter'].includes(role);
+      }
 
       function setStatus(element, message, isError = false) {
         element.textContent = message;
@@ -354,14 +1552,892 @@
         element.classList.toggle('ok', !isError);
       }
 
+      function persistSession() {
+        localStorage.setItem(
+          'posSession',
+          JSON.stringify({
+            ...session,
+            token: state.token,
+            refreshToken: state.refreshToken,
+            expiresAt: state.expiresAt,
+            refreshExpiresAt: state.refreshExpiresAt,
+            sessionId: state.sessionId,
+            user: state.user,
+          }),
+        );
+      }
+
+      async function refreshSession() {
+        if (!state.refreshToken) {
+          return false;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken: state.refreshToken }),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            clearAuthTokens();
+            return false;
+          }
+
+          state.token = data.token;
+          state.refreshToken = data.refreshToken;
+          state.expiresAt = data.expiresAt;
+          state.refreshExpiresAt = data.refreshExpiresAt;
+          state.sessionId = data.sessionId;
+          persistSession();
+          return true;
+        } catch (error) {
+          clearAuthTokens();
+          return false;
+        }
+      }
+
+      function clearAuthTokens() {
+        state.token = null;
+        state.refreshToken = null;
+        state.expiresAt = null;
+        state.refreshExpiresAt = null;
+        state.sessionId = null;
+        persistSession();
+      }
+
+      async function requestJson(url, options = {}) {
+        const retried = Boolean(options.__retriedAuth);
+        const fetchOptions = { ...options };
+        delete fetchOptions.__retriedAuth;
+
+        const response = await fetch(url, fetchOptions);
+        const raw = await response.text();
+
+        let data = {};
+        if (raw) {
+          try {
+            data = JSON.parse(raw);
+          } catch (error) {
+            data = { message: raw };
+          }
+        }
+
+        if (response.status === 401 && !retried && (await refreshSession())) {
+          return requestJson(url, { ...options, headers: authHeaders(), __retriedAuth: true });
+        }
+
+        if (
+          response.status === 403 &&
+          !retried &&
+          state.token &&
+          String(data.message || '').toLowerCase().includes('acceso denegado')
+        ) {
+          clearAuthTokens();
+          return requestJson(url, { ...options, headers: authHeaders(), __retriedAuth: true });
+        }
+
+        if (!response.ok) {
+          const message = data.message || `HTTP ${response.status}`;
+          const err = new Error(message);
+          err.status = response.status;
+          throw err;
+        }
+
+        return data;
+      }
+
+      function handleAdminAuthFailure(error, targetStatus) {
+        if (error?.status === 403) {
+          setStatus(targetStatus, 'Sesion admin vencida. Inicia sesion nuevamente.', true);
+          setTimeout(() => {
+            logout();
+          }, 900);
+          return true;
+        }
+
+        return false;
+      }
+
+      function adminHeaders() {
+        return authHeaders();
+      }
+
+      function orderHeaders() {
+        return authHeaders();
+      }
+
+      function authHeaders() {
+        const headers = {
+          'Content-Type': 'application/json',
+          'x-user-id': String(state.user?.id || ''),
+          'x-user-role': String(state.user?.role || ''),
+        };
+
+        if (state.token) {
+          headers.Authorization = `Bearer ${state.token}`;
+        }
+
+        if (state.sessionId) {
+          headers['x-session-id'] = String(state.sessionId);
+        }
+
+        return {
+          ...headers,
+        };
+      }
+
+      function money(value) {
+        return Number(value || 0).toFixed(2);
+      }
+
+      function setModalOpen(modalElement, open) {
+        modalElement.classList.toggle('open', open);
+        modalElement.setAttribute('aria-hidden', open ? 'false' : 'true');
+      }
+
+      function openTableModal(config) {
+        const { tableNumber = null, initialGuestCount = null, allowTableInput = false } = config || {};
+        refs.tableModalTitle.textContent = tableNumber ? `Abrir mesa ${tableNumber}` : 'Abrir mesa';
+        refs.tableModalSubtitle.textContent = tableNumber
+          ? `Define cuantas personas se sentaron en mesa ${tableNumber}.`
+          : 'Define la mesa y cuantas personas se sentaron.';
+
+        refs.tableNumberField.style.display = allowTableInput ? 'grid' : 'none';
+        refs.tableNumberInput.value = tableNumber ? String(tableNumber) : '';
+        refs.tableGuestCountInput.value = initialGuestCount ? String(initialGuestCount) : '';
+        setModalOpen(refs.tableModal, true);
+
+        setTimeout(() => {
+          const focusTarget = allowTableInput ? refs.tableNumberInput : refs.tableGuestCountInput;
+          focusTarget.focus();
+          focusTarget.select();
+        }, 0);
+
+        return new Promise((resolve) => {
+          modalState.tableResolver = resolve;
+        });
+      }
+
+      function closeTableModal(result) {
+        if (!modalState.tableResolver) {
+          return;
+        }
+
+        const resolver = modalState.tableResolver;
+        modalState.tableResolver = null;
+        setModalOpen(refs.tableModal, false);
+        resolver(result);
+      }
+
+      function updatePaymentModalSummary() {
+        const total = Number(refs.paymentModal.dataset.total || 0);
+        const method = refs.paymentMethodSelect.value;
+        const amountReceived = Number(refs.amountReceivedInput.value || 0);
+
+        refs.amountReceivedField.style.display = method === 'efectivo' ? 'grid' : 'none';
+        refs.quickCashRow.classList.toggle('muted', method !== 'efectivo');
+        refs.cashActionsRow.classList.toggle('muted', method !== 'efectivo');
+        refs.paymentNumpad.classList.toggle('muted', method !== 'efectivo');
+        refs.amountPreview.textContent = `$${money(amountReceived || 0)}`;
+        if (method === 'tarjeta') {
+          refs.paymentChangeText.textContent = 'Cambio: $0.00';
+          return;
+        }
+
+        const change = Number.isFinite(amountReceived) ? amountReceived - total : 0;
+        refs.paymentChangeText.textContent = `Cambio: $${money(change > 0 ? change : 0)}`;
+      }
+
+      function setAmountReceivedValue(value) {
+        refs.amountReceivedInput.value = String(Number(value || 0));
+        updatePaymentModalSummary();
+      }
+
+      function appendAmountKey(key) {
+        const current = String(refs.amountReceivedInput.value || '');
+        if (key === '.') {
+          if (current.includes('.')) {
+            return;
+          }
+          refs.amountReceivedInput.value = current ? `${current}.` : '0.';
+          updatePaymentModalSummary();
+          return;
+        }
+
+        const next = `${current}${key}`.replace(/^0+(\d)/, '$1');
+        refs.amountReceivedInput.value = next;
+        updatePaymentModalSummary();
+      }
+
+      function openPaymentModal(total) {
+        refs.paymentModal.dataset.total = String(total);
+        refs.paymentTotalText.textContent = `Total: $${money(total)}`;
+        refs.paymentMethodSelect.value = 'efectivo';
+        refs.amountReceivedInput.value = String(total);
+        updatePaymentModalSummary();
+        setModalOpen(refs.paymentModal, true);
+
+        setTimeout(() => {
+          refs.paymentMethodSelect.focus();
+        }, 0);
+
+        return new Promise((resolve) => {
+          modalState.paymentResolver = resolve;
+        });
+      }
+
+      function closePaymentModal(result) {
+        if (!modalState.paymentResolver) {
+          return;
+        }
+
+        const resolver = modalState.paymentResolver;
+        modalState.paymentResolver = null;
+        setModalOpen(refs.paymentModal, false);
+        resolver(result);
+      }
+
+      function normalizeCartItems(rawCart) {
+        if (!Array.isArray(rawCart)) {
+          return [];
+        }
+
+        const normalized = rawCart
+          .map((item) => ({
+            productId: Number(item.productId),
+            name: String(item.name || ''),
+            price: Number(item.price),
+            quantity: Number(item.quantity),
+          }))
+          .filter(
+            (item) => Number.isInteger(item.productId) && item.name && Number.isFinite(item.price) && item.quantity > 0,
+          );
+
+        const byProduct = new Map();
+        for (const item of normalized) {
+          const existing = byProduct.get(item.productId);
+          if (!existing) {
+            byProduct.set(item.productId, { ...item });
+            continue;
+          }
+
+          existing.quantity += item.quantity;
+          existing.price = item.price;
+          if (item.name) {
+            existing.name = item.name;
+          }
+        }
+
+        return Array.from(byProduct.values());
+      }
+
+      function saveTablesState() {
+        if (state.user?.role !== 'cashier') {
+          return;
+        }
+
+        const payload = {
+          tableStates: state.tableStates,
+          tableDrafts: state.tableDrafts,
+          selectedTable: state.selectedTable,
+        };
+
+        localStorage.setItem(TABLES_STORAGE_KEY, JSON.stringify(payload));
+      }
+
+      function loadTablesState() {
+        if (state.user?.role !== 'cashier') {
+          return;
+        }
+
+        const raw = localStorage.getItem(TABLES_STORAGE_KEY);
+        if (!raw) {
+          return;
+        }
+
+        try {
+          const parsed = JSON.parse(raw);
+          state.tableStates = parsed?.tableStates && typeof parsed.tableStates === 'object' ? parsed.tableStates : {};
+          state.tableDrafts = parsed?.tableDrafts && typeof parsed.tableDrafts === 'object' ? parsed.tableDrafts : {};
+
+          const restoredSelectedTable = Number(parsed?.selectedTable || 0);
+          if (Number.isInteger(restoredSelectedTable) && restoredSelectedTable > 0 && restoredSelectedTable <= state.totalTables) {
+            state.selectedTable = restoredSelectedTable;
+          }
+
+          for (let table = 1; table <= state.totalTables; table += 1) {
+            const draft = state.tableDrafts[table];
+            if (!draft) {
+              continue;
+            }
+
+            draft.guestCount = Number(draft.guestCount || 0) || null;
+            draft.lastOrderId = Number(draft.lastOrderId || 0) || null;
+            draft.cart = normalizeCartItems(draft.cart);
+          }
+
+          if (state.selectedTable) {
+            hydrateFromTableDraft(state.selectedTable);
+          }
+        } catch (error) {
+          state.tableStates = {};
+          state.tableDrafts = {};
+          state.selectedTable = null;
+        }
+      }
+
+      function syncCurrentTableDraft() {
+        if (!['cashier', 'waiter'].includes(state.user?.role) || !state.selectedTable) {
+          return;
+        }
+
+        state.tableDrafts[state.selectedTable] = {
+          guestCount: state.guestCount,
+          lastOrderId: state.lastOrderId,
+          cart: state.cart,
+        };
+
+        saveTablesState();
+        queueCurrentTableAccountSync();
+      }
+
+      function toAccountItemsFromCart(cart) {
+        return normalizeCartItems(cart).map((item) => ({
+          productId: item.productId,
+          productName: item.name,
+          unitPrice: Number(item.price),
+          quantity: Number(item.quantity),
+        }));
+      }
+
+      function toCartItemsFromAccount(account) {
+        if (!account || !Array.isArray(account.items)) {
+          return [];
+        }
+
+        return normalizeCartItems(
+          account.items
+          .map((item) => ({
+            productId: Number(item.productId),
+            name: String(item.productName || item.name || ''),
+            price: Number(item.unitPrice || 0),
+            quantity: Number(item.quantity || 0),
+          })),
+        );
+      }
+
+      async function saveCurrentTableAccountRemote(options = {}) {
+        const { retryOnForbidden = true } = options;
+        if (!['cashier', 'waiter'].includes(state.user?.role) || !state.selectedTable) {
+          return;
+        }
+
+        const payload = {
+          guestCount: state.guestCount,
+          lastOrderId: state.lastOrderId,
+          items: toAccountItemsFromCart(state.cart),
+        };
+
+        try {
+          const data = await requestJson(`${API_URL}/api/table-accounts/${state.selectedTable}`, {
+            method: 'PUT',
+            headers: orderHeaders(),
+            body: JSON.stringify(payload),
+          });
+
+          if (data?.account) {
+            state.remoteTableAccountsByTable[state.selectedTable] = data.account;
+          }
+        } catch (error) {
+          const serverMessage = String(error?.message || '').trim();
+          if (error?.status === 403) {
+            if (state.user?.role === 'waiter' && retryOnForbidden) {
+              await refreshWaiterTableStates(true);
+              const ownerInfo = state.waiterTableOwners[state.selectedTable];
+              if (!ownerInfo || Number(ownerInfo.userId) === Number(state.user?.id)) {
+                await saveCurrentTableAccountRemote({ retryOnForbidden: false });
+                return;
+              }
+            }
+
+            setStatus(refs.tableStatus, serverMessage || 'No puedes editar una mesa ocupada por otro usuario.', true);
+            return;
+          }
+
+          setStatus(
+            refs.tableStatus,
+            `No fue posible guardar cuenta de mesa en servidor.${serverMessage ? ` ${serverMessage}` : ''}`,
+            true,
+          );
+        }
+      }
+
+      function queueCurrentTableAccountSync() {
+        if (!['cashier', 'waiter'].includes(state.user?.role) || !state.selectedTable) {
+          return;
+        }
+
+        if (tableAccountSyncState.timerId) {
+          clearTimeout(tableAccountSyncState.timerId);
+        }
+
+        tableAccountSyncState.timerId = setTimeout(() => {
+          tableAccountSyncState.timerId = null;
+          saveCurrentTableAccountRemote();
+        }, 220);
+      }
+
+      function hydrateFromTableDraft(tableNumber) {
+        const draft = state.tableDrafts[tableNumber] || {};
+        state.guestCount = Number(draft.guestCount || 0) || null;
+        state.lastOrderId = Number(draft.lastOrderId || 0) || null;
+        state.cart = normalizeCartItems(draft.cart);
+      }
+
+      function updateTableContext() {
+        if (!state.selectedTable) {
+          refs.tableContext.textContent = 'Sin mesa seleccionada.';
+          refs.tableMeta.textContent = 'Selecciona una mesa para empezar.';
+          refs.orderPanelTitle.textContent = 'Orden actual';
+          return;
+        }
+
+        refs.tableContext.textContent = `Mesa ${state.selectedTable} - ${state.guestCount} persona(s)`;
+        refs.tableMeta.textContent = `Mesa activa: ${state.selectedTable} (${state.guestCount} personas)`;
+        refs.orderPanelTitle.textContent =
+          state.user?.role === 'cashier' ? `Cuenta mesa ${state.selectedTable}` : `Orden de mesa ${state.selectedTable}`;
+      }
+
+      function renderCashierTables() {
+        const role = state.user?.role;
+        refs.tableGrid.innerHTML = '';
+
+        for (let table = 1; table <= state.totalTables; table += 1) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          const remoteOrder = state.remoteOpenOrdersByTable[table];
+          const remoteAccount = state.remoteTableAccountsByTable[table];
+          let tableState = remoteOrder || remoteAccount ? 'occupied' : 'free';
+          const ownerInfo = state.waiterTableOwners[table];
+          let tableLabel = 'Libre';
+
+          if (role === 'waiter') {
+            tableState = ownerInfo ? 'occupied' : 'free';
+            if (ownerInfo && Number(ownerInfo.userId) !== Number(state.user?.id)) {
+              tableLabel = 'Ocupada';
+              button.title = `Mesa ocupada por ${ownerInfo.username || 'otro usuario'}`;
+            } else if (ownerInfo) {
+              tableLabel = 'Mia';
+              button.title = 'Mesa ocupada por ti';
+            } else {
+              tableLabel = 'Libre';
+              button.title = 'Mesa libre';
+            }
+          } else if (remoteAccount) {
+            tableLabel = `${Number(remoteAccount.items?.length || 0)} prod.`;
+          } else if (remoteOrder) {
+            tableLabel = `#${remoteOrder.id}`;
+          }
+
+          if ((remoteOrder || remoteAccount) && role !== 'waiter') {
+            if (remoteOrder) {
+              button.title = `Mesa ocupada. Cuenta #${remoteOrder.id} por ${remoteOrder.createdBy || 'usuario'}`;
+            } else {
+              button.title = `Mesa ocupada. Cuenta en curso por ${remoteAccount.updatedBy || 'usuario'}`;
+            }
+          }
+
+          button.className = `table-btn ${tableState} ${state.selectedTable === table ? 'active' : ''}`.trim();
+          button.innerHTML = `<span>${table}</span><small>${tableLabel}</small>`;
+          button.addEventListener('click', () => selectTable(table));
+          refs.tableGrid.appendChild(button);
+        }
+      }
+
+      function buildWaiterTableOwners(orders) {
+        const ownersByTable = {};
+        const sortedOrders = [...(orders || [])].sort((a, b) => Number(b.id) - Number(a.id));
+
+        for (const order of sortedOrders) {
+          if (order?.payment?.paid) {
+            continue;
+          }
+
+          const tableNumber = Number(order?.table?.number);
+          if (!Number.isInteger(tableNumber) || tableNumber <= 0) {
+            continue;
+          }
+
+          if (!ownersByTable[tableNumber]) {
+            ownersByTable[tableNumber] = {
+              userId: Number(order.createdByUserId) || null,
+              username: String(order.createdBy || ''),
+              guestCount: Number(order?.table?.guestCount || 0) || null,
+            };
+          }
+        }
+
+        return ownersByTable;
+      }
+
+      function buildRemoteOpenOrdersByTable(orders) {
+        const map = {};
+        const sortedOrders = [...(orders || [])].sort((a, b) => Number(b.id) - Number(a.id));
+
+        for (const order of sortedOrders) {
+          if (order?.payment?.paid) {
+            continue;
+          }
+
+          const tableNumber = Number(order?.table?.number);
+          if (!Number.isInteger(tableNumber) || tableNumber <= 0) {
+            continue;
+          }
+
+          if (!map[tableNumber]) {
+            map[tableNumber] = order;
+          }
+        }
+
+        return map;
+      }
+
+      function buildRemoteTableAccountsByTable(accounts) {
+        const map = {};
+        for (const account of accounts || []) {
+          const tableNumber = Number(account?.tableNumber);
+          if (!Number.isInteger(tableNumber) || tableNumber <= 0) {
+            continue;
+          }
+          map[tableNumber] = account;
+        }
+        return map;
+      }
+
+      function toCartItemsFromOrder(order) {
+        if (!order || !Array.isArray(order.items)) {
+          return [];
+        }
+
+        return normalizeCartItems(
+          order.items
+          .map((item) => ({
+            productId: Number(item.productId),
+            name: String(item.productName || item.name || ''),
+            price: Number(item.unitPrice || 0),
+            quantity: Number(item.quantity || 0),
+          })),
+        );
+      }
+
+      function buildPrintFingerprint(tableNumber, cart) {
+        const normalized = normalizeCartItems(cart)
+          .map((item) => `${item.productId}:${item.quantity}`)
+          .sort()
+          .join('|');
+        return `${Number(tableNumber) || 0}::${normalized}`;
+      }
+
+      function hydrateSelectedTableFromRemote() {
+        if (!state.selectedTable) {
+          return;
+        }
+
+        const tableNumber = Number(state.selectedTable);
+        const remoteAccount = state.remoteTableAccountsByTable[tableNumber];
+        const remoteOrder = state.remoteOpenOrdersByTable[tableNumber];
+
+        if (remoteAccount) {
+          state.guestCount = Number(remoteAccount.guestCount || 0) || state.guestCount;
+          state.lastOrderId = Number(remoteAccount.lastOrderId || 0) || state.lastOrderId;
+          state.cart = toCartItemsFromAccount(remoteAccount);
+          return;
+        }
+
+        if (remoteOrder) {
+          state.guestCount = Number(remoteOrder?.table?.guestCount || 0) || state.guestCount;
+          state.lastOrderId = Number(remoteOrder.id || 0) || state.lastOrderId;
+          state.cart = toCartItemsFromOrder(remoteOrder);
+        }
+      }
+
+      async function refreshOpenOrdersSnapshot(silent = false) {
+        if (!isTablePanelRole()) {
+          return;
+        }
+
+        try {
+          const [ordersData, accountsData] = await Promise.all([
+            requestJson(`${API_URL}/api/orders`, {
+              headers: orderHeaders(),
+            }),
+            requestJson(`${API_URL}/api/table-accounts/open`, {
+              headers: orderHeaders(),
+            }),
+          ]);
+
+          const orders = ordersData.orders || [];
+          const accounts = accountsData.accounts || [];
+          state.remoteOpenOrdersByTable = buildRemoteOpenOrdersByTable(orders);
+          state.remoteTableAccountsByTable = buildRemoteTableAccountsByTable(accounts);
+          state.waiterTableOwners = buildWaiterTableOwners(orders);
+          hydrateSelectedTableFromRemote();
+          renderCart();
+          updateTableContext();
+          renderCashierTables();
+        } catch (error) {
+          if (!silent) {
+            const detail = error?.message ? ` ${error.message}` : '';
+            setStatus(refs.tableStatus, `No fue posible sincronizar mesas.${detail}`, true);
+          }
+        }
+      }
+
+      async function refreshWaiterTableStates(silent = false) {
+        if (state.user?.role !== 'waiter') {
+          return;
+        }
+
+        await refreshOpenOrdersSnapshot(silent);
+      }
+
+      function applyRoleLayout() {
+        const role = state.user?.role;
+        const isCashier = role === 'cashier';
+        const isAdmin = role === 'admin';
+        const isWaiter = role === 'waiter';
+        document.body.classList.toggle('waiter-mode', isWaiter);
+        document.body.classList.toggle('cashier-mode', isCashier);
+        document.body.classList.toggle('admin-mode', isAdmin);
+
+        if (isCashier || isWaiter) {
+          refs.cashierTablesPanel.style.display = 'block';
+          refs.orderPanel.style.display = 'block';
+          refs.catalogPanel.style.display = 'block';
+          refs.catalogPanel.classList.remove('admin-dashboard');
+          refs.mainGrid.classList.remove('admin-view');
+          refs.catalogTitle.style.display = 'block';
+          refs.catalog.style.display = 'grid';
+          refs.adminPanel.style.display = 'none';
+          refs.leaveTableBtn.style.display = 'inline-block';
+          refs.mainGrid.style.display = isCashier ? (state.selectedTable ? 'grid' : 'none') : 'grid';
+          refs.createOrderBtn.style.display = isWaiter ? 'none' : 'inline-block';
+          refs.sendKitchenBtn.style.display = isWaiter ? 'none' : 'inline-block';
+          refs.readyBtn.style.display = isWaiter ? 'none' : 'inline-block';
+          refs.deliverBtn.style.display = isWaiter ? 'none' : 'inline-block';
+          refs.printOrderBtn.style.display = 'inline-block';
+          refs.printCustomerTicketBtn.style.display = isWaiter ? 'none' : 'inline-block';
+          refs.payOrderBtn.style.display = isWaiter ? 'none' : 'inline-block';
+          if (state.selectedTable) {
+            renderCart();
+          }
+          updateTableContext();
+          renderCashierTables();
+          return;
+        }
+
+        if (isAdmin) {
+          refs.cashierTablesPanel.style.display = 'none';
+          refs.mainGrid.style.display = 'grid';
+          refs.mainGrid.classList.add('admin-view');
+          refs.catalogPanel.style.display = 'block';
+          refs.catalogPanel.classList.add('admin-dashboard');
+          refs.orderPanel.style.display = 'none';
+          refs.catalogTitle.style.display = 'none';
+          refs.catalog.style.display = 'none';
+          refs.adminPanel.style.display = 'block';
+          updateTableContext();
+          return;
+        }
+
+        refs.cashierTablesPanel.style.display = 'none';
+        refs.mainGrid.style.display = 'grid';
+        refs.mainGrid.classList.remove('admin-view');
+        refs.catalogPanel.classList.remove('admin-dashboard');
+        refs.catalogTitle.style.display = 'block';
+        refs.catalog.style.display = 'grid';
+        refs.adminPanel.style.display = 'none';
+        refs.createOrderBtn.style.display = isWaiter ? 'none' : 'inline-block';
+        refs.sendKitchenBtn.style.display = isWaiter ? 'none' : 'inline-block';
+        refs.readyBtn.style.display = isWaiter ? 'none' : 'inline-block';
+        refs.deliverBtn.style.display = isWaiter ? 'none' : 'inline-block';
+        refs.printOrderBtn.style.display = isWaiter ? 'inline-block' : 'none';
+        refs.printCustomerTicketBtn.style.display = isWaiter ? 'inline-block' : 'none';
+        refs.payOrderBtn.style.display = isWaiter ? 'none' : 'inline-block';
+        updateTableContext();
+      }
+
+      async function selectTable(tableNumber) {
+        const role = state.user?.role;
+
+        if (role === 'waiter') {
+          await refreshWaiterTableStates(true);
+          const ownerInfo = state.waiterTableOwners[tableNumber];
+          const remoteAccount = state.remoteTableAccountsByTable[tableNumber];
+          const remoteOrder = state.remoteOpenOrdersByTable[tableNumber];
+
+          if (ownerInfo && Number(ownerInfo.userId) !== Number(state.user?.id)) {
+            setStatus(refs.tableStatus, `Mesa ${tableNumber} ocupada por ${ownerInfo.username || 'otro usuario'}.`, true);
+            renderCashierTables();
+            return;
+          }
+
+          state.selectedTable = tableNumber;
+          state.guestCount = remoteAccount?.guestCount
+            ? Number(remoteAccount.guestCount)
+            : ownerInfo?.guestCount
+              ? Number(ownerInfo.guestCount)
+              : null;
+          state.cart = [];
+          state.lastOrderId = null;
+
+          if (remoteAccount) {
+            state.cart = toCartItemsFromAccount(remoteAccount);
+            state.lastOrderId = Number(remoteAccount.lastOrderId || 0) || null;
+          } else if (remoteOrder) {
+            state.cart = toCartItemsFromOrder(remoteOrder);
+            state.lastOrderId = Number(remoteOrder.id) || null;
+          }
+
+          if (!state.guestCount) {
+            const modalResult = await openTableModal({
+              tableNumber,
+              initialGuestCount: null,
+              allowTableInput: false,
+            });
+            if (!modalResult) {
+              return;
+            }
+
+            const people = Number(modalResult.guestCount);
+            if (!Number.isInteger(people) || people <= 0 || people > 30) {
+              setStatus(refs.tableStatus, 'Ingresa un numero valido de personas (1 a 30).', true);
+              return;
+            }
+
+            state.guestCount = people;
+          }
+
+          renderCart();
+          renderCatalog();
+          setStatus(refs.tableStatus, `Mesa ${tableNumber} activa.`);
+          setStatus(refs.orderStatus, `Trabajando en mesa ${tableNumber}.`);
+          applyRoleLayout();
+          return;
+        }
+
+        await refreshOpenOrdersSnapshot(true);
+
+        syncCurrentTableDraft();
+
+        const existingDraft = state.tableDrafts[tableNumber];
+        const remoteOrder = state.remoteOpenOrdersByTable[tableNumber];
+        const remoteAccount = state.remoteTableAccountsByTable[tableNumber];
+        let people = remoteAccount?.guestCount
+          ? Number(remoteAccount.guestCount)
+          : existingDraft?.guestCount
+            ? Number(existingDraft.guestCount)
+            : null;
+
+        if (!people) {
+          if (remoteOrder) {
+            people = Number(remoteOrder?.table?.guestCount || 0) || null;
+          }
+
+          if (!people) {
+          const modalResult = await openTableModal({
+            tableNumber,
+            initialGuestCount: null,
+            allowTableInput: false,
+          });
+          if (!modalResult) {
+            return;
+          }
+
+          people = Number(modalResult.guestCount);
+          if (!Number.isInteger(people) || people <= 0 || people > 30) {
+            setStatus(refs.tableStatus, 'Ingresa un numero valido de personas (1 a 30).', true);
+            return;
+          }
+          }
+        }
+
+        if (remoteAccount) {
+          state.lastOrderId = Number(remoteAccount.lastOrderId || 0) || null;
+          state.cart = toCartItemsFromAccount(remoteAccount);
+        } else if (remoteOrder && !existingDraft) {
+          state.lastOrderId = Number(remoteOrder.id) || null;
+          state.cart = toCartItemsFromOrder(remoteOrder);
+        }
+
+        state.selectedTable = tableNumber;
+        state.guestCount = people;
+        if (!remoteAccount) {
+          hydrateFromTableDraft(tableNumber);
+        }
+        if (!state.guestCount && people) {
+          state.guestCount = people;
+        }
+
+        if (!state.tableStates[tableNumber]) {
+          state.tableStates[tableNumber] = 'free';
+        }
+
+        if (state.remoteOpenOrdersByTable[tableNumber] || state.remoteTableAccountsByTable[tableNumber]) {
+          state.tableStates[tableNumber] = 'occupied';
+        }
+
+        syncCurrentTableDraft();
+        renderCart();
+        if (state.user?.role === 'waiter') {
+          renderCatalog();
+        }
+        setStatus(refs.tableStatus, `Mesa ${tableNumber} activa con ${people} persona(s).`);
+        setStatus(refs.orderStatus, `Trabajando en mesa ${tableNumber}.`);
+        applyRoleLayout();
+      }
+
+      function leaveCurrentTable() {
+        if (!state.selectedTable) {
+          setStatus(refs.tableStatus, 'No hay mesa activa.', true);
+          return;
+        }
+
+        syncCurrentTableDraft();
+        state.selectedTable = null;
+        state.guestCount = null;
+        state.cart = [];
+        state.lastOrderId = null;
+        if (tableAccountSyncState.timerId) {
+          clearTimeout(tableAccountSyncState.timerId);
+          tableAccountSyncState.timerId = null;
+        }
+        renderCart();
+        if (state.user?.role === 'waiter') {
+          renderCatalog();
+        }
+        setStatus(refs.tableStatus, 'Mesa cerrada. Selecciona una nueva mesa.');
+        setStatus(refs.orderStatus, 'No hay orden activa.');
+        applyRoleLayout();
+        saveTablesState();
+      }
+
       function renderCatalog() {
         refs.catalog.innerHTML = '';
         state.products.forEach((product) => {
+          const quantityInCart = state.cart
+            .filter((item) => Number(item.productId) === Number(product.id))
+            .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
           const card = document.createElement('article');
           card.className = 'product';
           card.innerHTML = `
             <h3>${product.name}</h3>
-            <span class="chips">${product.category}</span>
+            <div class="product-meta">
+              <span class="chips">${product.category}</span>
+              <span class="cart-count" title="Cantidad en orden">${quantityInCart}</span>
+            </div>
             <p><strong>$${product.price}</strong></p>
             <button data-id="${product.id}">Agregar</button>
           `;
@@ -377,22 +2453,310 @@
         products.forEach((product) => {
           const row = document.createElement('article');
           row.innerHTML = `
-            <strong>${product.name}</strong> - ${product.category} - $${product.price} ${
-            product.isActive ? '' : '(inactivo)'
-          }
+            <div class="admin-card-title">
+              <div>
+                <strong>${product.name}</strong>
+                <div class="admin-card-meta">${product.category} - $${money(product.price)}</div>
+              </div>
+              <span class="admin-badge ${product.isActive ? 'ok' : 'warn'}">${product.isActive ? 'Activo' : 'Inactivo'}</span>
+            </div>
             <div class="actions">
+              <input data-name-input="${product.id}" type="text" value="${product.name}" placeholder="Nombre" />
+              <input data-category-input="${product.id}" type="text" value="${product.category}" placeholder="Categoria" />
+              <button class="secondary" data-update-info="${product.id}">Editar nombre/categoria</button>
+              <input data-price-input="${product.id}" type="number" min="1" step="0.01" value="${product.price}" />
+              <button class="secondary" data-update-price="${product.id}">Cambiar precio</button>
               <button class="secondary" data-disable="${product.id}" ${product.isActive ? '' : 'disabled'}>
-                Desactivar
+                Eliminar
               </button>
             </div>
           `;
 
-          row.querySelector('button').addEventListener('click', () => deactivateProduct(product.id));
+          row
+            .querySelector('[data-update-info]')
+            .addEventListener('click', () => updateProductInfo(product.id, row));
+          row
+            .querySelector('[data-update-price]')
+            .addEventListener('click', () => updateProductPrice(product.id, row));
+          row.querySelector('[data-disable]').addEventListener('click', () => deactivateProduct(product.id));
           refs.adminProducts.appendChild(row);
         });
       }
 
+      function renderEmployees(employees) {
+        refs.employeeList.innerHTML = '';
+        employees.forEach((employee) => {
+          const row = document.createElement('article');
+          row.innerHTML = `
+            <div class="admin-card-title">
+              <div>
+                <strong>${employee.name}</strong>
+                <div class="admin-card-meta">@${employee.username} - codigo ${employee.accessCode}</div>
+              </div>
+              <span class="admin-badge">${employee.role}</span>
+            </div>
+            <div class="actions">
+              <button class="secondary" data-delete-employee="${employee.id}">Eliminar usuario</button>
+            </div>
+          `;
+          row
+            .querySelector('[data-delete-employee]')
+            .addEventListener('click', () => removeEmployee(employee.id, employee.name));
+          refs.employeeList.appendChild(row);
+        });
+      }
+
+      function renderPaidAccounts(accounts) {
+        refs.paidAccountsTableBody.innerHTML = '';
+
+        if (!accounts.length) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="6">No hay cuentas pagadas registradas.</td>';
+          refs.paidAccountsTableBody.appendChild(row);
+          return;
+        }
+
+        accounts.forEach((item) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.reference}</td>
+            <td>#${item.orderId}</td>
+            <td>$${money(item.total)}</td>
+            <td>${item.paymentMethod}</td>
+            <td>${new Date(item.paidAt).toLocaleString('es-MX')}</td>
+            <td>${item.cutReference || 'Dia abierto'}</td>
+          `;
+          refs.paidAccountsTableBody.appendChild(row);
+        });
+      }
+
+      function renderDailySales(summary) {
+        refs.salesTableBody.innerHTML = '';
+
+        if (!summary.length) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="4">No hay ventas pagadas registradas.</td>';
+          refs.salesTableBody.appendChild(row);
+          return;
+        }
+
+        summary.forEach((item) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.date}</td>
+            <td>${item.orders}</td>
+            <td>$${money(item.revenue)}</td>
+            <td>$${money(item.averageTicket)}</td>
+          `;
+          refs.salesTableBody.appendChild(row);
+        });
+      }
+
+      function fillProductSelect(selectElement, placeholder = 'Selecciona producto') {
+        selectElement.innerHTML = `<option value="">${placeholder}</option>`;
+        state.products.forEach((product) => {
+          const option = document.createElement('option');
+          option.value = String(product.id);
+          option.textContent = `${product.name} - ${product.category}`;
+          selectElement.appendChild(option);
+        });
+      }
+
+      function refreshProductSelectors() {
+        fillProductSelect(refs.inventoryEntryProduct);
+        fillProductSelect(refs.inventoryMovementProduct);
+        fillProductSelect(refs.inventoryTransferProduct);
+      }
+
+      function renderInventoryStocks(stocks) {
+        refs.inventoryStocksBody.innerHTML = '';
+
+        if (!stocks.length) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="7">Sin existencias registradas.</td>';
+          refs.inventoryStocksBody.appendChild(row);
+          return;
+        }
+
+        stocks.forEach((stock) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${stock.productName}</td>
+            <td>${stock.locationKey}</td>
+            <td>${Number(stock.quantity || 0).toFixed(3)}</td>
+            <td>$${money(stock.averageCost)}</td>
+            <td>$${money(stock.lastCost)}</td>
+            <td>
+              <input data-min-stock="${stock.id}" type="number" min="0" step="0.001" value="${Number(stock.minStock || 0)}" />
+            </td>
+            <td><button class="secondary" data-update-min-stock="${stock.id}">Guardar minimo</button></td>
+          `;
+          row
+            .querySelector('[data-update-min-stock]')
+            .addEventListener('click', () => updateInventoryMinStock(stock.id, row));
+          refs.inventoryStocksBody.appendChild(row);
+        });
+      }
+
+      function renderInventoryMovements(movements) {
+        refs.inventoryMovementsBody.innerHTML = '';
+
+        if (!movements.length) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="6">Sin historial de movimientos.</td>';
+          refs.inventoryMovementsBody.appendChild(row);
+          return;
+        }
+
+        movements.slice(0, 30).forEach((movement) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${new Date(movement.createdAt).toLocaleString('es-MX')}</td>
+            <td>${movement.type}</td>
+            <td>${movement.productName}</td>
+            <td>${Number(movement.quantity || 0).toFixed(3)}</td>
+            <td>$${money(movement.unitCost)}</td>
+            <td>${movement.referenceType || '-'} ${movement.referenceId || ''}</td>
+          `;
+          refs.inventoryMovementsBody.appendChild(row);
+        });
+      }
+
+      function renderInventoryAlerts(alerts) {
+        refs.inventoryAlerts.innerHTML = '';
+
+        if (!alerts.length) {
+          const row = document.createElement('article');
+          row.innerHTML = '<span class="admin-badge ok">Inventario sano</span><p class="admin-card-meta">Sin alertas abiertas de stock minimo.</p>';
+          refs.inventoryAlerts.appendChild(row);
+          return;
+        }
+
+        alerts.forEach((alert) => {
+          const row = document.createElement('article');
+          row.innerHTML = `
+            <div class="admin-card-title">
+              <strong>${alert.message}</strong>
+              <span class="admin-badge warn">Stock bajo</span>
+            </div>
+            <p class="admin-card-meta">Actual: ${Number(alert.currentQuantity || 0).toFixed(3)} | Minimo: ${Number(alert.threshold || 0).toFixed(3)}</p>
+          `;
+          refs.inventoryAlerts.appendChild(row);
+        });
+      }
+
+      function renderSecurityOptions() {
+        refs.securityEmployeeSelect.innerHTML = '<option value="">Selecciona empleado</option>';
+        state.employees.forEach((employee) => {
+          const option = document.createElement('option');
+          option.value = String(employee.id);
+          option.textContent = `${employee.name} - ${employee.role}`;
+          refs.securityEmployeeSelect.appendChild(option);
+        });
+
+        refs.securityRoleSelect.innerHTML = '<option value="">Selecciona rol heredado</option>';
+        state.securityRoles.forEach((role) => {
+          const option = document.createElement('option');
+          option.value = role.code;
+          option.textContent = `${role.name} (${role.code})`;
+          refs.securityRoleSelect.appendChild(option);
+        });
+
+        refs.securityPermissionSelect.innerHTML = '<option value="">Selecciona permiso directo</option>';
+        state.securityPermissions.forEach((permission) => {
+          const option = document.createElement('option');
+          option.value = permission.code;
+          option.textContent = `${permission.code} - ${permission.name}`;
+          refs.securityPermissionSelect.appendChild(option);
+        });
+      }
+
+      function renderSecurityRoles(roles) {
+        refs.securityRolesList.innerHTML = '';
+
+        roles.forEach((role) => {
+          const row = document.createElement('article');
+          const permissionCodes = role.permissions.map((permission) => permission.code).join(', ');
+          row.innerHTML = `
+            <div class="admin-card-title">
+              <div>
+                <strong>${role.name}</strong>
+                <div class="admin-card-meta">${role.description || 'Sin descripcion.'}</div>
+              </div>
+              <span class="admin-badge">${role.code}</span>
+            </div>
+            <p><small>${permissionCodes || 'Sin permisos asignados.'}</small></p>
+          `;
+          refs.securityRolesList.appendChild(row);
+        });
+      }
+
+      function renderEmployeePermissions(detail) {
+        refs.selectedEmployeePermissions.innerHTML = '';
+
+        if (!detail?.employee) {
+          refs.selectedEmployeePermissions.textContent = 'Selecciona un empleado para ver permisos efectivos.';
+          return;
+        }
+
+        const title = document.createElement('strong');
+        title.textContent = `Permisos efectivos de ${detail.employee.name}`;
+        refs.selectedEmployeePermissions.appendChild(title);
+
+        if (!detail.permissions?.length) {
+          const empty = document.createElement('span');
+          empty.textContent = 'Sin permisos efectivos.';
+          refs.selectedEmployeePermissions.appendChild(empty);
+          return;
+        }
+
+        detail.permissions.forEach((permissionCode) => {
+          const chip = document.createElement('span');
+          chip.className = 'permission-chip';
+          chip.textContent = permissionCode;
+          refs.selectedEmployeePermissions.appendChild(chip);
+        });
+      }
+
+      function renderSessions(sessions) {
+        refs.sessionsTableBody.innerHTML = '';
+
+        if (!sessions.length) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="6">No hay sesiones registradas.</td>';
+          refs.sessionsTableBody.appendChild(row);
+          return;
+        }
+
+        sessions.forEach((sessionItem) => {
+          const row = document.createElement('tr');
+          const currentText = sessionItem.current ? 'Actual' : 'Cerrar';
+          row.innerHTML = `
+            <td>${sessionItem.name} (${sessionItem.role})</td>
+            <td>${sessionItem.deviceName || sessionItem.deviceId || 'Sin dispositivo'}</td>
+            <td>${sessionItem.ipAddress || '-'}</td>
+            <td>${sessionItem.status}${sessionItem.current ? ' / actual' : ''}</td>
+            <td>${new Date(sessionItem.lastSeenAt).toLocaleString('es-MX')}</td>
+            <td><button class="secondary" data-revoke-session="${sessionItem.id}" ${sessionItem.current ? 'disabled' : ''}>${currentText}</button></td>
+          `;
+          row
+            .querySelector('[data-revoke-session]')
+            .addEventListener('click', () => revokeSession(sessionItem.id));
+          refs.sessionsTableBody.appendChild(row);
+        });
+      }
+
       function addToCart(productId) {
+        if (state.user?.role === 'admin') {
+          setStatus(refs.adminStatus, 'El admin no opera mesas ni carrito.', true);
+          return;
+        }
+
+        if (isTablePanelRole() && !state.selectedTable) {
+          setStatus(refs.tableStatus, 'Selecciona una mesa antes de agregar productos.', true);
+          return;
+        }
+
         const product = state.products.find((item) => item.id === productId);
         if (!product) {
           return;
@@ -405,12 +2769,20 @@
           state.cart.push({ productId: product.id, name: product.name, price: product.price, quantity: 1 });
         }
 
+        syncCurrentTableDraft();
         renderCart();
+        if (['waiter', 'cashier'].includes(state.user?.role)) {
+          renderCatalog();
+        }
       }
 
       function removeFromCart(productId) {
         state.cart = state.cart.filter((item) => item.productId !== productId);
+        syncCurrentTableDraft();
         renderCart();
+        if (['waiter', 'cashier'].includes(state.user?.role)) {
+          renderCatalog();
+        }
       }
 
       function renderCart() {
@@ -436,26 +2808,419 @@
       }
 
       async function loadProducts() {
-        const response = await fetch(`${API_URL}/api/catalog/products`);
-        const data = await response.json();
+        const data = await requestJson(`${API_URL}/api/catalog/products`);
         state.products = data.products || [];
         renderCatalog();
+        refreshProductSelectors();
       }
 
       async function loadAdminProducts() {
         try {
-          const response = await fetch(`${API_URL}/api/admin/products`);
+          const data = await requestJson(`${API_URL}/api/admin/products`, {
+            headers: adminHeaders(),
+          });
+
+          state.products = data.products || [];
+          renderAdminProducts(state.products);
+          refreshProductSelectors();
+          setStatus(refs.adminStatus, 'Listado de productos actualizado.');
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.adminStatus)) {
+            return;
+          }
+          setStatus(refs.adminStatus, error.message || 'Error al consultar productos admin.', true);
+        }
+      }
+
+      async function loadEmployees() {
+        try {
+          const data = await requestJson(`${API_URL}/api/admin/employees`, {
+            headers: adminHeaders(),
+          });
+
+          state.employees = data.employees || [];
+          renderEmployees(data.employees || []);
+          renderSecurityOptions();
+          setStatus(refs.employeeStatus, 'Listado de empleados actualizado.');
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.employeeStatus)) {
+            return;
+          }
+          setStatus(refs.employeeStatus, error.message || 'Error al cargar empleados.', true);
+        }
+      }
+
+      async function loadDailySales() {
+        try {
+          const data = await requestJson(`${API_URL}/api/admin/sales/daily`, {
+            headers: adminHeaders(),
+          });
+
+          renderDailySales(data.summary || []);
+          setStatus(refs.salesStatus, `Total vendido: $${money(data.totals?.revenue || 0)}.`);
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.salesStatus)) {
+            return;
+          }
+          setStatus(refs.salesStatus, error.message || 'Error al cargar resumen diario.', true);
+        }
+      }
+
+      async function loadPaidAccounts() {
+        try {
+          const data = await requestJson(`${API_URL}/api/admin/sales/paid-accounts`, {
+            headers: adminHeaders(),
+          });
+
+          const accounts = data.accounts || [];
+          renderPaidAccounts(accounts);
+          setStatus(refs.paidAccountsStatus, `${accounts.length} cuenta(s) pagada(s) cargada(s).`);
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.paidAccountsStatus)) {
+            return;
+          }
+          setStatus(refs.paidAccountsStatus, error.message || 'Error al cargar cuentas pagadas.', true);
+        }
+      }
+
+      async function loadInventoryDashboard() {
+        try {
+          const [stocksData, movementsData, alertsData] = await Promise.all([
+            requestJson(`${API_URL}/api/inventory/stocks`, { headers: adminHeaders() }),
+            requestJson(`${API_URL}/api/inventory/movements?limit=80`, { headers: adminHeaders() }),
+            requestJson(`${API_URL}/api/inventory/alerts`, { headers: adminHeaders() }),
+          ]);
+
+          state.inventoryStocks = stocksData.stocks || [];
+          state.inventoryMovements = movementsData.movements || [];
+          state.inventoryAlerts = alertsData.alerts || [];
+
+          renderInventoryStocks(state.inventoryStocks);
+          renderInventoryMovements(state.inventoryMovements);
+          renderInventoryAlerts(state.inventoryAlerts);
+          setStatus(
+            refs.inventoryStatus,
+            `${state.inventoryStocks.length} existencia(s), ${state.inventoryAlerts.length} alerta(s) abierta(s).`,
+          );
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.inventoryStatus)) {
+            return;
+          }
+          setStatus(refs.inventoryStatus, error.message || 'Error al cargar inventario.', true);
+        }
+      }
+
+      async function loadSecurityDashboard() {
+        try {
+          const [rolesData, permissionsData] = await Promise.all([
+            requestJson(`${API_URL}/api/security/roles`, { headers: adminHeaders() }),
+            requestJson(`${API_URL}/api/security/permissions`, { headers: adminHeaders() }),
+          ]);
+
+          state.securityRoles = rolesData.roles || [];
+          state.securityPermissions = permissionsData.permissions || [];
+          renderSecurityOptions();
+          renderSecurityRoles(state.securityRoles);
+          setStatus(refs.securityStatus, `${state.securityRoles.length} rol(es), ${state.securityPermissions.length} permiso(s).`);
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.securityStatus)) {
+            return;
+          }
+          setStatus(refs.securityStatus, error.message || 'Error al cargar roles y permisos.', true);
+        }
+      }
+
+      async function loadEmployeePermissionDetail() {
+        const employeeId = Number(refs.securityEmployeeSelect.value || 0);
+        if (!employeeId) {
+          renderEmployeePermissions(null);
+          return;
+        }
+
+        try {
+          const data = await requestJson(`${API_URL}/api/security/employees/${employeeId}/permissions`, {
+            headers: adminHeaders(),
+          });
+          renderEmployeePermissions(data);
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.securityStatus)) {
+            return;
+          }
+          setStatus(refs.securityStatus, error.message || 'Error al consultar permisos del empleado.', true);
+        }
+      }
+
+      async function loadSessions() {
+        try {
+          const data = await requestJson(`${API_URL}/api/auth/sessions`, {
+            headers: adminHeaders(),
+          });
+
+          state.authSessions = data.sessions || [];
+          renderSessions(state.authSessions);
+          setStatus(refs.sessionsStatus, `${state.authSessions.length} sesion(es) cargada(s).`);
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.sessionsStatus)) {
+            return;
+          }
+          setStatus(refs.sessionsStatus, error.message || 'Error al cargar sesiones.', true);
+        }
+      }
+
+      async function addInventoryEntry() {
+        const productId = Number(refs.inventoryEntryProduct.value || 0);
+        const quantity = Number(refs.inventoryEntryQuantity.value || 0);
+        const unitCost = Number(refs.inventoryEntryUnitCost.value || 0);
+        const minStock = refs.inventoryEntryMinStock.value === '' ? undefined : Number(refs.inventoryEntryMinStock.value);
+
+        if (!productId || !Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(unitCost) || unitCost <= 0) {
+          setStatus(refs.inventoryStatus, 'Selecciona producto, cantidad y costo validos.', true);
+          return;
+        }
+
+        try {
+          await requestJson(`${API_URL}/api/inventory/entries`, {
+            method: 'POST',
+            headers: adminHeaders(),
+            body: JSON.stringify({
+              productId,
+              quantity,
+              unitCost,
+              minStock,
+              locationKey: refs.inventoryEntryLocation.value.trim() || 'global',
+              reason: 'entrada manual',
+            }),
+          });
+
+          refs.inventoryEntryQuantity.value = '';
+          refs.inventoryEntryUnitCost.value = '';
+          setStatus(refs.inventoryStatus, 'Entrada registrada.');
+          await loadInventoryDashboard();
+        } catch (error) {
+          setStatus(refs.inventoryStatus, error.message || 'No fue posible registrar entrada.', true);
+        }
+      }
+
+      async function runInventoryMovement() {
+        const productId = Number(refs.inventoryMovementProduct.value || 0);
+        const type = refs.inventoryMovementType.value;
+        const quantity = Number(refs.inventoryMovementQuantity.value || 0);
+        const newQuantity = Number(refs.inventoryAdjustmentQuantity.value);
+        const locationKey = refs.inventoryMovementLocation.value.trim() || 'global';
+        const reason = refs.inventoryMovementReason.value.trim() || type;
+
+        if (!productId) {
+          setStatus(refs.inventoryStatus, 'Selecciona un producto.', true);
+          return;
+        }
+
+        let url = `${API_URL}/api/inventory/outputs`;
+        let payload = { productId, quantity, locationKey, reason };
+
+        if (type === 'merma') {
+          url = `${API_URL}/api/inventory/waste`;
+        }
+
+        if (type === 'ajuste') {
+          url = `${API_URL}/api/inventory/adjustments`;
+          payload = { productId, newQuantity, locationKey, reason };
+          if (!Number.isFinite(newQuantity)) {
+            setStatus(refs.inventoryStatus, 'Ingresa la nueva existencia para ajuste.', true);
+            return;
+          }
+        } else if (!Number.isFinite(quantity) || quantity <= 0) {
+          setStatus(refs.inventoryStatus, 'Ingresa una cantidad mayor a cero.', true);
+          return;
+        }
+
+        try {
+          await requestJson(url, {
+            method: 'POST',
+            headers: adminHeaders(),
+            body: JSON.stringify(payload),
+          });
+
+          refs.inventoryMovementQuantity.value = '';
+          refs.inventoryAdjustmentQuantity.value = '';
+          setStatus(refs.inventoryStatus, 'Movimiento registrado.');
+          await loadInventoryDashboard();
+        } catch (error) {
+          setStatus(refs.inventoryStatus, error.message || 'No fue posible registrar movimiento.', true);
+        }
+      }
+
+      async function runInventoryTransfer() {
+        const productId = Number(refs.inventoryTransferProduct.value || 0);
+        const quantity = Number(refs.inventoryTransferQuantity.value || 0);
+        const fromLocationKey = refs.inventoryTransferFrom.value.trim() || 'global';
+        const toLocationKey = refs.inventoryTransferTo.value.trim();
+
+        if (!productId || !Number.isFinite(quantity) || quantity <= 0 || !toLocationKey) {
+          setStatus(refs.inventoryStatus, 'Completa producto, cantidad y destino.', true);
+          return;
+        }
+
+        try {
+          await requestJson(`${API_URL}/api/inventory/transfers`, {
+            method: 'POST',
+            headers: adminHeaders(),
+            body: JSON.stringify({ productId, quantity, fromLocationKey, toLocationKey }),
+          });
+
+          refs.inventoryTransferQuantity.value = '';
+          setStatus(refs.inventoryStatus, 'Transferencia registrada.');
+          await loadInventoryDashboard();
+        } catch (error) {
+          setStatus(refs.inventoryStatus, error.message || 'No fue posible transferir inventario.', true);
+        }
+      }
+
+      async function updateInventoryMinStock(stockId, row) {
+        const input = row.querySelector(`[data-min-stock="${stockId}"]`);
+        const minStock = Number(input?.value);
+
+        if (!Number.isFinite(minStock) || minStock < 0) {
+          setStatus(refs.inventoryStatus, 'Stock minimo invalido.', true);
+          return;
+        }
+
+        try {
+          await requestJson(`${API_URL}/api/inventory/stocks/${stockId}/min-stock`, {
+            method: 'PATCH',
+            headers: adminHeaders(),
+            body: JSON.stringify({ minStock }),
+          });
+          setStatus(refs.inventoryStatus, 'Stock minimo actualizado.');
+          await loadInventoryDashboard();
+        } catch (error) {
+          setStatus(refs.inventoryStatus, error.message || 'No fue posible actualizar stock minimo.', true);
+        }
+      }
+
+      async function assignEmployeeRole() {
+        const employeeId = Number(refs.securityEmployeeSelect.value || 0);
+        const roleCode = refs.securityRoleSelect.value;
+
+        if (!employeeId || !roleCode) {
+          setStatus(refs.securityStatus, 'Selecciona empleado y rol.', true);
+          return;
+        }
+
+        try {
+          await requestJson(`${API_URL}/api/security/employees/${employeeId}/roles`, {
+            method: 'POST',
+            headers: adminHeaders(),
+            body: JSON.stringify({ roleCode }),
+          });
+          setStatus(refs.securityStatus, 'Rol asignado.');
+          await loadEmployeePermissionDetail();
+        } catch (error) {
+          setStatus(refs.securityStatus, error.message || 'No fue posible asignar rol.', true);
+        }
+      }
+
+      async function assignEmployeePermission() {
+        const employeeId = Number(refs.securityEmployeeSelect.value || 0);
+        const permissionCode = refs.securityPermissionSelect.value;
+
+        if (!employeeId || !permissionCode) {
+          setStatus(refs.securityStatus, 'Selecciona empleado y permiso.', true);
+          return;
+        }
+
+        try {
+          await requestJson(`${API_URL}/api/security/employees/${employeeId}/permissions`, {
+            method: 'POST',
+            headers: adminHeaders(),
+            body: JSON.stringify({ permissionCode }),
+          });
+          setStatus(refs.securityStatus, 'Permiso asignado.');
+          await loadEmployeePermissionDetail();
+        } catch (error) {
+          setStatus(refs.securityStatus, error.message || 'No fue posible asignar permiso.', true);
+        }
+      }
+
+      async function revokeSession(sessionId) {
+        const shouldRevoke = window.confirm('Cerrar esta sesion de forma remota?');
+        if (!shouldRevoke) {
+          return;
+        }
+
+        try {
+          await requestJson(`${API_URL}/api/auth/sessions/${sessionId}`, {
+            method: 'DELETE',
+            headers: adminHeaders(),
+          });
+          setStatus(refs.sessionsStatus, 'Sesion cerrada.');
+          await loadSessions();
+        } catch (error) {
+          setStatus(refs.sessionsStatus, error.message || 'No fue posible cerrar sesion.', true);
+        }
+      }
+
+      async function removeEmployee(employeeId, employeeName) {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.employeeStatus, 'Solo un admin puede eliminar usuarios.', true);
+          return;
+        }
+
+        const shouldDelete = window.confirm(`Eliminar usuario ${employeeName}?`);
+        if (!shouldDelete) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/employees/${employeeId}`, {
+            method: 'DELETE',
+            headers: adminHeaders(),
+          });
           const data = await response.json();
 
           if (!response.ok) {
-            setStatus(refs.adminStatus, data.message || 'No fue posible cargar productos admin.', true);
+            setStatus(refs.employeeStatus, data.message || 'No fue posible eliminar usuario.', true);
             return;
           }
 
-          renderAdminProducts(data.products || []);
-          setStatus(refs.adminStatus, 'Listado de productos actualizado.');
+          setStatus(refs.employeeStatus, `Usuario eliminado: ${data.employee.name}.`);
+          await loadEmployees();
         } catch (error) {
-          setStatus(refs.adminStatus, 'Error de comunicacion al consultar productos admin.', true);
+          setStatus(refs.employeeStatus, 'Error de comunicacion al eliminar usuario.', true);
+        }
+      }
+
+      async function runDailyCutoff() {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.cutoffStatus, 'Solo un admin puede realizar corte.', true);
+          return;
+        }
+
+        const shouldRun = window.confirm('Se realizara corte del dia. Continuar?');
+        if (!shouldRun) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/sales/cutoff`, {
+            method: 'POST',
+            headers: adminHeaders(),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.cutoffStatus, data.message || 'No fue posible realizar corte.', true);
+            return;
+          }
+
+          const cut = data.cut;
+          setStatus(
+            refs.cutoffStatus,
+            `Corte ${cut.reference} generado. Ordenes: ${cut.ordersCount}, total: $${money(cut.revenue)}.`,
+          );
+
+          await Promise.all([loadDailySales(), loadPaidAccounts()]);
+        } catch (error) {
+          setStatus(refs.cutoffStatus, 'Error de comunicacion al realizar corte.', true);
         }
       }
 
@@ -479,7 +3244,7 @@
         try {
           const response = await fetch(`${API_URL}/api/admin/products`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: adminHeaders(),
             body: JSON.stringify(payload),
           });
           const data = await response.json();
@@ -499,27 +3264,137 @@
         }
       }
 
+      async function updateProductPrice(productId, row) {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.adminStatus, 'Solo un admin puede cambiar precios.', true);
+          return;
+        }
+
+        const input = row.querySelector('[data-price-input]');
+        const price = Number(input?.value);
+        if (!Number.isFinite(price) || price <= 0) {
+          setStatus(refs.adminStatus, 'Ingresa un precio valido mayor a 0.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/products/${productId}`, {
+            method: 'PATCH',
+            headers: adminHeaders(),
+            body: JSON.stringify({ price }),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.adminStatus, data.message || 'No fue posible cambiar precio.', true);
+            return;
+          }
+
+          setStatus(refs.adminStatus, `Precio actualizado para ${data.product.name}.`);
+          await Promise.all([loadProducts(), loadAdminProducts()]);
+        } catch (error) {
+          setStatus(refs.adminStatus, 'Error de comunicacion al cambiar precio.', true);
+        }
+      }
+
+      async function updateProductInfo(productId, row) {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.adminStatus, 'Solo un admin puede editar productos.', true);
+          return;
+        }
+
+        const name = row.querySelector('[data-name-input]')?.value.trim();
+        const category = row.querySelector('[data-category-input]')?.value.trim();
+
+        if (!name || !category) {
+          setStatus(refs.adminStatus, 'Nombre y categoria son requeridos.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/products/${productId}`, {
+            method: 'PATCH',
+            headers: adminHeaders(),
+            body: JSON.stringify({ name, category }),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.adminStatus, data.message || 'No fue posible editar producto.', true);
+            return;
+          }
+
+          setStatus(refs.adminStatus, `Producto actualizado: ${data.product.name}.`);
+          await Promise.all([loadProducts(), loadAdminProducts()]);
+        } catch (error) {
+          setStatus(refs.adminStatus, 'Error de comunicacion al editar producto.', true);
+        }
+      }
+
       async function deactivateProduct(productId) {
         if (!state.user || state.user.role !== 'admin') {
-          setStatus(refs.adminStatus, 'Solo un admin puede desactivar productos.', true);
+          setStatus(refs.adminStatus, 'Solo un admin puede eliminar productos.', true);
           return;
         }
 
         try {
           const response = await fetch(`${API_URL}/api/admin/products/${productId}`, {
             method: 'DELETE',
+            headers: adminHeaders(),
           });
           const data = await response.json();
 
           if (!response.ok) {
-            setStatus(refs.adminStatus, data.message || 'No fue posible desactivar producto.', true);
+            setStatus(refs.adminStatus, data.message || 'No fue posible eliminar producto.', true);
             return;
           }
 
-          setStatus(refs.adminStatus, `Producto desactivado: ${data.product.name}`);
+          setStatus(refs.adminStatus, `Producto eliminado: ${data.product.name}`);
           await Promise.all([loadProducts(), loadAdminProducts()]);
         } catch (error) {
-          setStatus(refs.adminStatus, 'Error de comunicacion al desactivar producto.', true);
+          setStatus(refs.adminStatus, 'Error de comunicacion al eliminar producto.', true);
+        }
+      }
+
+      async function addEmployee() {
+        if (!state.user || state.user.role !== 'admin') {
+          setStatus(refs.employeeStatus, 'Solo un admin puede agregar empleados.', true);
+          return;
+        }
+
+        const payload = {
+          name: refs.newEmployeeName.value.trim(),
+          username: refs.newEmployeeUsername.value.trim(),
+          role: refs.newEmployeeRole.value.trim() || 'cashier',
+          accessCode: String(refs.newEmployeeCode.value || '').trim(),
+        };
+
+        if (!payload.name || !payload.username || !/^\d{4,8}$/.test(payload.accessCode)) {
+          setStatus(refs.employeeStatus, 'Completa nombre, usuario y codigo de 4 a 8 digitos.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/admin/employees`, {
+            method: 'POST',
+            headers: adminHeaders(),
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.employeeStatus, data.message || 'No fue posible agregar empleado.', true);
+            return;
+          }
+
+          setStatus(refs.employeeStatus, `Empleado agregado: ${data.employee.name}.`);
+          refs.newEmployeeName.value = '';
+          refs.newEmployeeUsername.value = '';
+          refs.newEmployeeRole.value = '';
+          refs.newEmployeeCode.value = '';
+          await loadEmployees();
+        } catch (error) {
+          setStatus(refs.employeeStatus, 'Error de comunicacion al agregar empleado.', true);
         }
       }
 
@@ -534,12 +3409,22 @@
           return;
         }
 
+        if (['cashier', 'admin'].includes(state.user.role) && !state.selectedTable) {
+          setStatus(refs.orderStatus, 'Selecciona una mesa antes de crear la orden.', true);
+          return;
+        }
+
         try {
           const items = state.cart.map((item) => ({ productId: item.productId, quantity: item.quantity }));
           const response = await fetch(`${API_URL}/api/orders`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items, createdBy: state.user.username }),
+            headers: orderHeaders(),
+            body: JSON.stringify({
+              items,
+              createdBy: state.user.username,
+              tableNumber: state.selectedTable,
+              guestCount: state.guestCount,
+            }),
           });
           const data = await response.json();
 
@@ -549,10 +3434,20 @@
           }
 
           state.lastOrderId = data.order.id;
+          if (state.selectedTable) {
+            state.tableStates[state.selectedTable] = 'occupied';
+            state.tableDrafts[state.selectedTable] = {
+              guestCount: state.guestCount,
+              lastOrderId: state.lastOrderId,
+              cart: state.cart,
+            };
+            saveTablesState();
+          }
           state.cart = [];
           renderCart();
+          renderCashierTables();
           setStatus(refs.orderStatus, `Orden #${data.order.id} creada con exito.`);
-          await refreshTelemetry();
+          await refreshOpenOrdersSnapshot(true);
         } catch (error) {
           setStatus(refs.orderStatus, 'Error de comunicacion con backend.', true);
         }
@@ -577,7 +3472,7 @@
 
           const response = await fetch(url, {
             method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: orderHeaders(),
             body,
           });
 
@@ -588,30 +3483,312 @@
           }
 
           setStatus(refs.orderStatus, `Orden #${data.order.id} en estado: ${data.order.status}`);
-          await refreshTelemetry();
+          await refreshOpenOrdersSnapshot(true);
         } catch (error) {
           setStatus(refs.orderStatus, 'Error al actualizar estado de orden.', true);
         }
       }
 
-      async function refreshTelemetry() {
-        try {
-          const response = await fetch(`${API_URL}/api/telemetry/summary`);
-          const data = await response.json();
+      async function payOrder() {
+        if (!state.lastOrderId && !state.selectedTable) {
+          setStatus(refs.orderStatus, 'Primero crea una orden para continuar.', true);
+          return;
+        }
 
-          refs.kpiOrders.textContent = String(data.totals.orders || 0);
-          refs.kpiDelivered.textContent = String(data.totals.delivered || 0);
-          refs.kpiEvents.textContent = String(data.totals.telemetryEvents || 0);
-          refs.kpiAvg.textContent = String(data.avgProcessingSeconds || 0);
+        try {
+          let paymentTarget = null;
+
+          if (state.selectedTable) {
+            if (state.cart.length) {
+              await saveCurrentTableAccountRemote();
+            }
+
+            const accountData = await requestJson(`${API_URL}/api/table-accounts/${state.selectedTable}`, {
+              headers: orderHeaders(),
+            });
+            const account = accountData.account;
+            const accountItems = Array.isArray(account?.items) ? account.items : [];
+            const accountTotal = Number(accountItems.reduce((sum, item) => sum + Number(item.subtotal || 0), 0).toFixed(2));
+
+            if (account && accountItems.length && accountTotal > 0) {
+              paymentTarget = {
+                type: 'table-account',
+                tableNumber: Number(state.selectedTable),
+                total: accountTotal,
+              };
+            }
+          }
+
+          if (!paymentTarget) {
+            const ordersData = await requestJson(`${API_URL}/api/orders`, {
+              headers: orderHeaders(),
+            });
+            const sortedOrders = Array.isArray(ordersData.orders) ? [...ordersData.orders] : [];
+            sortedOrders.sort((a, b) => Number(b.id) - Number(a.id));
+
+            let currentOrder = null;
+            if (state.selectedTable) {
+              currentOrder = sortedOrders.find(
+                (item) =>
+                  Number(item?.table?.number) === Number(state.selectedTable) &&
+                  !item?.payment?.paid,
+              );
+            }
+
+            if (!currentOrder && state.lastOrderId) {
+              currentOrder = sortedOrders.find((item) => Number(item.id) === Number(state.lastOrderId));
+            }
+
+            if (!currentOrder) {
+              setStatus(refs.orderStatus, 'No se encontro una cuenta u orden para cobrar.', true);
+              return;
+            }
+
+            state.lastOrderId = Number(currentOrder.id);
+            if (currentOrder?.table?.number) {
+              state.selectedTable = Number(currentOrder.table.number);
+            }
+
+            paymentTarget = {
+              type: 'order',
+              orderId: Number(currentOrder.id),
+              total: Number(currentOrder.total || 0),
+            };
+          }
+
+          const total = Number(paymentTarget.total || 0);
+          const paymentInput = await openPaymentModal(total);
+          if (!paymentInput) {
+            return;
+          }
+
+          const method = String(paymentInput.method).trim().toLowerCase();
+          if (!['efectivo', 'tarjeta'].includes(method)) {
+            setStatus(refs.orderStatus, 'Metodo invalido. Usa efectivo o tarjeta.', true);
+            return;
+          }
+
+          const amountReceived = Number(paymentInput.amountReceived);
+          if (method === 'efectivo' && (!Number.isFinite(amountReceived) || amountReceived < total)) {
+            setStatus(refs.orderStatus, 'El monto recibido debe ser mayor o igual al total.', true);
+            return;
+          }
+
+          const paymentUrl =
+            paymentTarget.type === 'table-account'
+              ? `${API_URL}/api/table-accounts/${paymentTarget.tableNumber}/pay`
+              : `${API_URL}/api/orders/${paymentTarget.orderId}/pay`;
+
+          const data = await requestJson(paymentUrl, {
+            method: 'POST',
+            headers: orderHeaders(),
+            body: JSON.stringify({ method, amountReceived }),
+          });
+
+          const ticketMessage = data.cashierPrint?.queued
+            ? ' Ticket enviandose a impresora.'
+            : ` Ticket: ${data.cashierPrint?.okCount || 0} impresora(s) ok, ${data.cashierPrint?.failCount || 0} con error.`;
+          const change = Number(data.order?.payment?.change || 0);
+          const paymentMessage =
+            method === 'efectivo'
+              ? ` Pago en efectivo. Cambio: $${money(change)}.`
+              : ` Pago con tarjeta por $${money(total)}.`;
+          setStatus(
+            refs.orderStatus,
+            `Orden #${data.order.id} pagada.${paymentMessage}${ticketMessage}`,
+          );
+          const paidTableNumber = Number(data.order?.table?.number || 0) || null;
+          if (paidTableNumber) {
+            state.tableStates[paidTableNumber] = 'free';
+            state.tableDrafts[paidTableNumber] = {
+              guestCount: null,
+              lastOrderId: null,
+              cart: [],
+            };
+
+            try {
+              await requestJson(`${API_URL}/api/table-accounts/${paidTableNumber}`, {
+                method: 'DELETE',
+                headers: orderHeaders(),
+              });
+              delete state.remoteTableAccountsByTable[paidTableNumber];
+            } catch (error) {
+              setStatus(refs.tableStatus, 'Pago realizado, pero no se pudo cerrar cuenta de mesa en servidor.', true);
+            }
+          }
+          state.lastOrderId = null;
+          if (!paidTableNumber || Number(state.selectedTable) === Number(paidTableNumber)) {
+            state.selectedTable = null;
+          }
+          state.guestCount = null;
+          renderCart();
+          applyRoleLayout();
+          saveTablesState();
+          await refreshOpenOrdersSnapshot(true);
+          if (['admin', 'cashier'].includes(state.user?.role)) {
+            loadInventoryDashboard();
+          }
         } catch (error) {
-          refs.kpiOrders.textContent = '-';
-          refs.kpiDelivered.textContent = '-';
-          refs.kpiEvents.textContent = '-';
-          refs.kpiAvg.textContent = '-';
+          setStatus(refs.orderStatus, error.message || 'Error de comunicacion al cobrar orden.', true);
         }
       }
 
-      function logout() {
+      async function printCurrentTableOrder() {
+        if (!['cashier', 'admin', 'waiter'].includes(state.user?.role)) {
+          setStatus(refs.orderStatus, 'Esta accion es solo para cajero o mesero.', true);
+          return;
+        }
+
+        if (state.printOrderInFlight) {
+          setStatus(refs.orderStatus, 'Ya se esta enviando el pedido. Espera un momento.', true);
+          return;
+        }
+
+        if (state.user?.role === 'waiter') {
+          if (!state.selectedTable) {
+            setStatus(refs.orderStatus, 'Selecciona una mesa antes de imprimir pedido.', true);
+            return;
+          }
+
+          await refreshWaiterTableStates(true);
+          const ownerInfo = state.waiterTableOwners[state.selectedTable];
+          if (ownerInfo && Number(ownerInfo.userId) !== Number(state.user?.id)) {
+            setStatus(refs.orderStatus, `Mesa ${state.selectedTable} ocupada por ${ownerInfo.username || 'otro usuario'}.`, true);
+            return;
+          }
+
+          if (!state.guestCount) {
+            const modalResult = await openTableModal({
+              tableNumber: state.selectedTable,
+              initialGuestCount: null,
+              allowTableInput: false,
+            });
+            if (!modalResult) {
+              return;
+            }
+
+            const requestedGuests = Number(modalResult.guestCount);
+            if (!Number.isInteger(requestedGuests) || requestedGuests <= 0 || requestedGuests > 30) {
+              setStatus(refs.orderStatus, 'Numero de personas invalido.', true);
+              return;
+            }
+
+            state.guestCount = requestedGuests;
+          }
+
+          updateTableContext();
+        } else if (!state.selectedTable) {
+          setStatus(refs.orderStatus, 'Selecciona una mesa antes de imprimir pedido.', true);
+          return;
+        }
+
+        if (!state.cart.length) {
+          setStatus(refs.orderStatus, 'Agrega productos antes de enviar a impresion.', true);
+          return;
+        }
+
+        const fingerprint = buildPrintFingerprint(state.selectedTable, state.cart);
+        const nowMs = Date.now();
+        const recentWindowMs = 8000;
+        if (state.lastPrintFingerprint === fingerprint && nowMs - state.lastPrintAtMs < recentWindowMs) {
+          setStatus(refs.orderStatus, 'Pedido ya enviado hace unos segundos. Evita duplicados.', true);
+          return;
+        }
+
+        try {
+          state.printOrderInFlight = true;
+          refs.printOrderBtn.disabled = true;
+
+          const items = state.cart.map((item) => ({ productId: item.productId, quantity: item.quantity }));
+          const createResponse = await fetch(`${API_URL}/api/orders`, {
+            method: 'POST',
+            headers: orderHeaders(),
+            body: JSON.stringify({
+              items,
+              createdBy: state.user.username,
+              tableNumber: state.selectedTable,
+              guestCount: state.guestCount,
+            }),
+          });
+          const createData = await createResponse.json();
+
+          if (!createResponse.ok) {
+            setStatus(refs.orderStatus, createData.message || 'No fue posible crear pedido para impresion.', true);
+            return;
+          }
+
+          state.lastOrderId = createData.order.id;
+          if (state.user?.role === 'cashier') {
+            state.tableStates[state.selectedTable] = 'occupied';
+            syncCurrentTableDraft();
+            renderCashierTables();
+          }
+
+          const printResponse = await fetch(`${API_URL}/api/orders/${state.lastOrderId}/send-kitchen`, {
+            method: 'POST',
+            headers: orderHeaders(),
+          });
+          const printData = await printResponse.json();
+
+          if (!printResponse.ok) {
+            setStatus(refs.orderStatus, printData.message || 'Pedido creado pero fallo impresion.', true);
+            return;
+          }
+
+          const printed = printData.kitchenPrint?.okCount || 0;
+          const failed = printData.kitchenPrint?.failCount || 0;
+          setStatus(refs.orderStatus, `Pedido mesa ${state.selectedTable} enviado. Impresion: ${printed} ok, ${failed} error.`);
+          state.lastPrintFingerprint = fingerprint;
+          state.lastPrintAtMs = Date.now();
+          await saveCurrentTableAccountRemote();
+          await refreshOpenOrdersSnapshot(true);
+          applyRoleLayout();
+        } catch (error) {
+          setStatus(refs.orderStatus, 'Error de comunicacion al enviar pedido a impresion.', true);
+        } finally {
+          state.printOrderInFlight = false;
+          refs.printOrderBtn.disabled = false;
+        }
+      }
+
+      async function printCustomerTicket() {
+        if (!state.lastOrderId) {
+          setStatus(refs.orderStatus, 'No hay orden activa para imprimir ticket cliente.', true);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_URL}/api/orders/${state.lastOrderId}/print-ticket`, {
+            method: 'POST',
+            headers: orderHeaders(),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(refs.orderStatus, data.message || 'No se pudo imprimir ticket cliente.', true);
+            return;
+          }
+
+          const printed = data.customerTicketPrint?.okCount || 0;
+          const failed = data.customerTicketPrint?.failCount || 0;
+          setStatus(refs.orderStatus, `Ticket cliente de orden #${data.order.id}. Impresion: ${printed} ok, ${failed} error.`);
+        } catch (error) {
+          setStatus(refs.orderStatus, 'Error de comunicacion al imprimir ticket cliente.', true);
+        }
+      }
+
+      async function logout() {
+        if (state.token) {
+          try {
+            await fetch(`${API_URL}/api/auth/logout`, {
+              method: 'POST',
+              headers: authHeaders(),
+            });
+          } catch (error) {
+            // Local logout must continue even if backend is unavailable.
+          }
+        }
+
         localStorage.removeItem('posSession');
         window.location.href = './login.html';
       }
@@ -619,20 +3796,175 @@
       refs.sessionInfo.textContent = `Sesion activa: ${state.user.name} (${state.user.role})`;
       refs.logoutBtn.addEventListener('click', logout);
       refs.addProductBtn.addEventListener('click', addProduct);
+      refs.addInventoryEntryBtn.addEventListener('click', addInventoryEntry);
+      refs.runInventoryMovementBtn.addEventListener('click', runInventoryMovement);
+      refs.runInventoryTransferBtn.addEventListener('click', runInventoryTransfer);
+      refs.refreshInventoryBtn.addEventListener('click', loadInventoryDashboard);
       refs.createOrderBtn.addEventListener('click', createOrder);
       refs.sendKitchenBtn.addEventListener('click', () => updateOrderStage('send'));
       refs.readyBtn.addEventListener('click', () => updateOrderStage('lista'));
       refs.deliverBtn.addEventListener('click', () => updateOrderStage('entregada'));
-      refs.refreshTelemetryBtn.addEventListener('click', refreshTelemetry);
+      refs.printOrderBtn.addEventListener('click', printCurrentTableOrder);
+      refs.printCustomerTicketBtn.addEventListener('click', printCustomerTicket);
+      refs.payOrderBtn.addEventListener('click', payOrder);
+      refs.addEmployeeBtn.addEventListener('click', addEmployee);
+      refs.refreshSecurityBtn.addEventListener('click', loadSecurityDashboard);
+      refs.securityEmployeeSelect.addEventListener('change', loadEmployeePermissionDetail);
+      refs.assignRoleBtn.addEventListener('click', assignEmployeeRole);
+      refs.assignPermissionBtn.addEventListener('click', assignEmployeePermission);
+      refs.refreshSessionsBtn.addEventListener('click', loadSessions);
+      refs.refreshPaidAccountsBtn.addEventListener('click', loadPaidAccounts);
+      refs.refreshSalesBtn.addEventListener('click', loadDailySales);
+      refs.runCutoffBtn.addEventListener('click', runDailyCutoff);
+      refs.leaveTableBtn.addEventListener('click', leaveCurrentTable);
+
+      refs.tableModalCancelBtn.addEventListener('click', () => closeTableModal(null));
+      refs.tableGuestQuickRow.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-guests]');
+        if (!button) {
+          return;
+        }
+
+        refs.tableGuestCountInput.value = button.getAttribute('data-guests');
+        refs.tableGuestCountInput.focus();
+      });
+      refs.tableModalConfirmBtn.addEventListener('click', () => {
+        const tableInputVisible = refs.tableNumberField.style.display !== 'none';
+        const tableNumber = tableInputVisible ? Number(refs.tableNumberInput.value || 0) : Number(refs.tableNumberInput.value || state.selectedTable || 0);
+        const guestCount = Number(refs.tableGuestCountInput.value || 0);
+
+        if (!Number.isInteger(tableNumber) || tableNumber <= 0 || tableNumber > state.totalTables) {
+          if (tableInputVisible) {
+            refs.tableNumberInput.focus();
+            return;
+          }
+        }
+
+        if (!Number.isInteger(guestCount) || guestCount <= 0 || guestCount > 30) {
+          refs.tableGuestCountInput.focus();
+          return;
+        }
+
+        closeTableModal({ tableNumber, guestCount });
+      });
+
+      refs.tableNumberInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          refs.tableGuestCountInput.focus();
+        }
+      });
+
+      refs.tableGuestCountInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          refs.tableModalConfirmBtn.click();
+        }
+      });
+
+      refs.paymentMethodSelect.addEventListener('change', updatePaymentModalSummary);
+      refs.amountReceivedInput.addEventListener('input', updatePaymentModalSummary);
+      refs.quickCashRow.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-cash]');
+        if (!button || refs.paymentMethodSelect.value !== 'efectivo') {
+          return;
+        }
+
+        setAmountReceivedValue(Number(button.getAttribute('data-cash')));
+      });
+      refs.payExactBtn.addEventListener('click', () => {
+        if (refs.paymentMethodSelect.value !== 'efectivo') {
+          return;
+        }
+
+        const total = Number(refs.paymentModal.dataset.total || 0);
+        setAmountReceivedValue(total);
+      });
+      refs.clearAmountBtn.addEventListener('click', () => {
+        if (refs.paymentMethodSelect.value !== 'efectivo') {
+          return;
+        }
+
+        refs.amountReceivedInput.value = '';
+        updatePaymentModalSummary();
+      });
+      refs.backspaceAmountBtn.addEventListener('click', () => {
+        if (refs.paymentMethodSelect.value !== 'efectivo') {
+          return;
+        }
+
+        refs.amountReceivedInput.value = String(refs.amountReceivedInput.value || '').slice(0, -1);
+        updatePaymentModalSummary();
+      });
+      refs.paymentNumpad.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-key]');
+        if (!button || refs.paymentMethodSelect.value !== 'efectivo') {
+          return;
+        }
+
+        appendAmountKey(button.getAttribute('data-key'));
+      });
+      refs.paymentModalCancelBtn.addEventListener('click', () => closePaymentModal(null));
+      refs.paymentModalConfirmBtn.addEventListener('click', () => {
+        const total = Number(refs.paymentModal.dataset.total || 0);
+        const method = refs.paymentMethodSelect.value;
+        let amountReceived = total;
+
+        if (method === 'efectivo') {
+          amountReceived = Number(refs.amountReceivedInput.value || 0);
+          if (!Number.isFinite(amountReceived) || amountReceived < total) {
+            refs.amountReceivedInput.focus();
+            return;
+          }
+        }
+
+        closePaymentModal({ method, amountReceived });
+      });
+
+      refs.amountReceivedInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          refs.paymentModalConfirmBtn.click();
+        }
+      });
+
+      refs.tableModal.addEventListener('click', (event) => {
+        if (event.target === refs.tableModal) {
+          closeTableModal(null);
+        }
+      });
+
+      refs.paymentModal.addEventListener('click', (event) => {
+        if (event.target === refs.paymentModal) {
+          closePaymentModal(null);
+        }
+      });
 
       if (state.user.role === 'admin') {
         refs.adminPanel.style.display = 'block';
-        loadAdminProducts();
+        Promise.all([
+          loadAdminProducts(),
+          loadEmployees(),
+          loadDailySales(),
+          loadPaidAccounts(),
+          loadInventoryDashboard(),
+          loadSecurityDashboard(),
+          loadSessions(),
+        ]);
       }
 
-      Promise.all([loadProducts(), refreshTelemetry()]).catch(() => {
-        setStatus(refs.orderStatus, 'Backend no disponible. Inicia el servidor en puerto 3000.', true);
-      });
+      refreshSession();
+      setInterval(refreshSession, 10 * 60 * 1000);
+
+      loadTablesState();
+      applyRoleLayout();
+
+      if (isTablePanelRole()) {
+        refreshOpenOrdersSnapshot();
+      }
+
+      if (state.user.role !== 'admin') {
+        Promise.all([loadProducts()]).catch(() => {
+          setStatus(refs.orderStatus, 'Backend no disponible. Inicia el servidor en puerto 3000.', true);
+        });
+      }
     </script>
   </body>
 </html>

@@ -18,7 +18,7 @@ $wshShell = New-Object -ComObject WScript.Shell
 $shortcut = $wshShell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $launcherPath
 $shortcut.WorkingDirectory = $projectRoot
-$shortcut.WindowStyle = 1
+$shortcut.WindowStyle = 7
 $shortcut.Description = 'Inicia POS Los Pachecos con un click'
 $shortcut.IconLocation = "$env:SystemRoot\System32\SHELL32.dll,41"
 $shortcut.Save()

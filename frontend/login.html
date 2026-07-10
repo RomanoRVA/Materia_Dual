@@ -115,6 +115,29 @@
       .status.error {
         color: #b02b2b;
       }
+
+      .server-pill {
+        margin-top: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #e6c9b2;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        background: #fffaf5;
+      }
+
+      .server-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #b02b2b;
+      }
+
+      .server-dot.ok {
+        background: var(--ok);
+      }
     </style>
   </head>
   <body>
@@ -151,6 +174,14 @@
       <div style="margin-top: 10px">
         <button id="loginBtn" style="width: 100%">Ingresar</button>
       </div>
+      <div style="margin-top: 8px">
+        <button id="recoverCodeBtn" class="secondary" style="width: 100%">Recuperar codigo</button>
+      </div>
+
+      <div class="server-pill" id="serverPill">
+        <span class="server-dot" id="serverDot"></span>
+        <span id="serverStatusText">Servidor: verificando...</span>
+      </div>
 
       <div id="authStatus" class="status">Sin autenticar.</div>
     </main>
@@ -163,8 +194,33 @@
         clearCodeBtn: document.getElementById('clearCodeBtn'),
         backspaceCodeBtn: document.getElementById('backspaceCodeBtn'),
         loginBtn: document.getElementById('loginBtn'),
+        recoverCodeBtn: document.getElementById('recoverCodeBtn'),
+        serverPill: document.getElementById('serverPill'),
+        serverDot: document.getElementById('serverDot'),
+        serverStatusText: document.getElementById('serverStatusText'),
         authStatus: document.getElementById('authStatus'),
       };
+
+      let serverOnline = false;
+
+      function getDeviceId() {
+        const existing = localStorage.getItem('posDeviceId');
+        if (existing) {
+          return existing;
+        }
+
+        const next = `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        localStorage.setItem('posDeviceId', next);
+        return next;
+      }
+
+      function getDeviceName() {
+        return navigator.userAgent.includes('Electron') ? 'POS Escritorio' : 'POS Navegador';
+      }
+
+      function ordersUrl() {
+        return `./orders.html?v=${Date.now()}`;
+      }
 
       function setStatus(message, isError = false) {
         refs.authStatus.textContent = message;
@@ -183,6 +239,11 @@
       }
 
       async function login() {
+        if (!serverOnline) {
+          setStatus('Servidor desconectado. Espera reconexion para iniciar sesion.', true);
+          return;
+        }
+
         const accessCode = sanitizeAccessCode(refs.accessCode.value);
 
         if (accessCode.length < 4) {
@@ -194,7 +255,11 @@
           const response = await fetch(`${API_URL}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ accessCode }),
+            body: JSON.stringify({
+              accessCode,
+              deviceId: getDeviceId(),
+              deviceName: getDeviceName(),
+            }),
           });
 
           const data = await response.json();
@@ -203,13 +268,102 @@
             return;
           }
 
-          localStorage.setItem('posSession', JSON.stringify({ token: data.token, user: data.user }));
+          localStorage.setItem(
+            'posSession',
+            JSON.stringify({
+              token: data.token,
+              refreshToken: data.refreshToken,
+              expiresAt: data.expiresAt,
+              refreshExpiresAt: data.refreshExpiresAt,
+              sessionId: data.sessionId,
+              device: data.device,
+              user: data.user,
+            }),
+          );
           setStatus(`Sesion activa: ${data.user.name}`);
           setTimeout(() => {
-            window.location.href = './orders.html';
+            window.location.href = ordersUrl();
           }, 300);
         } catch (error) {
           setStatus('No fue posible conectar con el backend.', true);
+        }
+      }
+
+      async function recoverCode() {
+        if (!serverOnline) {
+          setStatus('Servidor desconectado. No se puede recuperar codigo.', true);
+          return;
+        }
+
+        const username = window.prompt('Usuario a recuperar');
+        if (!username) {
+          return;
+        }
+
+        try {
+          const requestResponse = await fetch(`${API_URL}/api/auth/password-reset/request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username.trim() }),
+          });
+          const requestData = await requestResponse.json();
+
+          if (!requestResponse.ok) {
+            setStatus(requestData.message || 'No fue posible solicitar recuperacion.', true);
+            return;
+          }
+
+          const resetToken = requestData.resetToken || window.prompt('Token de recuperacion');
+          if (!resetToken) {
+            setStatus(requestData.message || 'Solicitud de recuperacion generada.');
+            return;
+          }
+
+          const accessCode = sanitizeAccessCode(window.prompt('Nuevo codigo numerico de 4 a 8 digitos') || '');
+          if (accessCode.length < 4) {
+            setStatus('Codigo nuevo invalido.', true);
+            return;
+          }
+
+          const confirmResponse = await fetch(`${API_URL}/api/auth/password-reset/confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ resetToken, accessCode }),
+          });
+          const confirmData = await confirmResponse.json();
+
+          if (!confirmResponse.ok) {
+            setStatus(confirmData.message || 'No fue posible cambiar el codigo.', true);
+            return;
+          }
+
+          refs.accessCode.value = '';
+          setStatus(confirmData.message || 'Codigo actualizado.');
+        } catch (error) {
+          setStatus('Error de comunicacion al recuperar codigo.', true);
+        }
+      }
+
+      async function checkBackendHealth() {
+        try {
+          const response = await fetch(`${API_URL}/health`, {
+            method: 'GET',
+            cache: 'no-store',
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          serverOnline = true;
+          refs.serverDot.classList.add('ok');
+          refs.serverStatusText.textContent = 'Servidor: conectado';
+          refs.loginBtn.disabled = false;
+        } catch (error) {
+          serverOnline = false;
+          refs.serverDot.classList.remove('ok');
+          refs.serverStatusText.textContent = 'Servidor: desconectado';
+          refs.loginBtn.disabled = true;
         }
       }
 
@@ -241,11 +395,15 @@
       });
 
       refs.loginBtn.addEventListener('click', login);
+      refs.recoverCodeBtn.addEventListener('click', recoverCode);
 
       const existingSession = localStorage.getItem('posSession');
       if (existingSession) {
-        window.location.href = './orders.html';
+        window.location.href = ordersUrl();
       }
+
+      checkBackendHealth();
+      setInterval(checkBackendHealth, 4000);
     </script>
   </body>
 </html>

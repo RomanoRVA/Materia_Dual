@@ -1,0 +1,45 @@
+{
+  "name": "pos-los-pachecos-desktop",
+  "version": "1.0.0",
+  "description": "Aplicacion de escritorio para POS Los Pachecos",
+  "main": "main.js",
+  "author": "Equipo Los Pachecos",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.lospachecos.pos",
+    "productName": "POS Los Pachecos",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../frontend",
+        "to": "frontend"
+      },
+      {
+        "from": "../backend/dist",
+        "to": "backend-dist",
+        "filter": [
+          "pos-los-pachecos.exe",
+          ".env"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ]
+    }
+  }
+}

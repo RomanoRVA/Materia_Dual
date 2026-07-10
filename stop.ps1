@@ -72,5 +72,6 @@ Stop-ProcessByPort -Port $FrontendPort -Name 'Frontend'
 # Fallback para procesos que pudieron cambiar de puerto o no abrir socket al momento de inspeccion.
 Stop-ProcessByCommandLinePattern -Pattern 'node\s+src/server\.js' -Name 'Backend'
 Stop-ProcessByCommandLinePattern -Pattern 'python(\.exe)?\s+-m\s+http\.server' -Name 'Frontend'
+Stop-ProcessByCommandLinePattern -Pattern 'python(\.exe)?\s+serve-no-cache\.py' -Name 'Frontend'
 
 Write-Host "[DONE] Proceso de apagado completado." -ForegroundColor Cyan
