@@ -1058,6 +1058,7 @@
             <div class="admin-toolbar">
               <div class="admin-overview">
                 <a href="#adminProductsSection">Productos<small>Precios y catalogo</small></a>
+                <a href="#adminBusinessSection">Empresas<small>Sucursales y contexto</small></a>
                 <a href="#adminInventorySection">Inventario<small>Entradas y ajustes</small></a>
                 <a href="#adminEmployeesSection">Usuarios<small>Altas y bajas</small></a>
                 <a href="#adminSecuritySection">Permisos<small>Roles granulares</small></a>
@@ -1065,6 +1066,50 @@
                 <a href="#adminPaidAccountsSection">Cuentas<small>Referencias pagadas</small></a>
                 <a href="#adminCutoffSection">Corte<small>Cierre del dia</small></a>
               </div>
+            </div>
+
+            <div class="admin-section" id="adminBusinessSection">
+            <h2>Empresas y sucursales</h2>
+            <p>Administra los negocios y puntos de venta que usaran este POS.</p>
+            <div class="admin-subsection">
+              <h3>Nueva empresa</h3>
+              <div class="admin-form">
+                <input id="newEmpresaLegalName" type="text" placeholder="Razon social" />
+                <input id="newEmpresaTradeName" type="text" placeholder="Nombre comercial" />
+                <input id="newEmpresaTaxId" type="text" placeholder="RFC / identificador" />
+                <input id="newEmpresaPhone" type="text" placeholder="Telefono" />
+                <input id="newEmpresaEmail" type="email" placeholder="Correo" />
+                <button id="addEmpresaBtn" class="secondary">Agregar empresa</button>
+              </div>
+            </div>
+            <div class="admin-subsection">
+              <h3>Nueva sucursal</h3>
+              <div class="admin-form">
+                <select id="newSucursalEmpresa"></select>
+                <input id="newSucursalCode" type="text" placeholder="Codigo (MATRIZ, SUC02)" />
+                <input id="newSucursalName" type="text" placeholder="Nombre de sucursal" />
+                <input id="newSucursalAddress" type="text" placeholder="Direccion" />
+                <input id="newSucursalPhone" type="text" placeholder="Telefono" />
+                <button id="addSucursalBtn" class="secondary">Agregar sucursal</button>
+              </div>
+            </div>
+            <button id="refreshBusinessBtn" class="secondary">Actualizar empresas</button>
+            <div id="businessStatus" class="status">Sin empresas cargadas.</div>
+            <div id="empresaList" class="admin-products"></div>
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Empresa</th>
+                    <th>Codigo</th>
+                    <th>Sucursal</th>
+                    <th>Telefono</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="sucursalTableBody"></tbody>
+              </table>
+            </div>
             </div>
 
             <div class="admin-section" id="adminProductsSection">
@@ -1407,6 +1452,8 @@
         inventoryStocks: [],
         inventoryMovements: [],
         inventoryAlerts: [],
+        empresas: [],
+        sucursales: [],
         securityRoles: [],
         securityPermissions: [],
         authSessions: [],
@@ -1445,6 +1492,22 @@
         addProductBtn: document.getElementById('addProductBtn'),
         adminStatus: document.getElementById('adminStatus'),
         adminProducts: document.getElementById('adminProducts'),
+        newEmpresaLegalName: document.getElementById('newEmpresaLegalName'),
+        newEmpresaTradeName: document.getElementById('newEmpresaTradeName'),
+        newEmpresaTaxId: document.getElementById('newEmpresaTaxId'),
+        newEmpresaPhone: document.getElementById('newEmpresaPhone'),
+        newEmpresaEmail: document.getElementById('newEmpresaEmail'),
+        addEmpresaBtn: document.getElementById('addEmpresaBtn'),
+        newSucursalEmpresa: document.getElementById('newSucursalEmpresa'),
+        newSucursalCode: document.getElementById('newSucursalCode'),
+        newSucursalName: document.getElementById('newSucursalName'),
+        newSucursalAddress: document.getElementById('newSucursalAddress'),
+        newSucursalPhone: document.getElementById('newSucursalPhone'),
+        addSucursalBtn: document.getElementById('addSucursalBtn'),
+        refreshBusinessBtn: document.getElementById('refreshBusinessBtn'),
+        businessStatus: document.getElementById('businessStatus'),
+        empresaList: document.getElementById('empresaList'),
+        sucursalTableBody: document.getElementById('sucursalTableBody'),
         inventoryEntryProduct: document.getElementById('inventoryEntryProduct'),
         inventoryEntryQuantity: document.getElementById('inventoryEntryQuantity'),
         inventoryEntryUnitCost: document.getElementById('inventoryEntryUnitCost'),
@@ -1681,6 +1744,14 @@
 
         if (state.sessionId) {
           headers['x-session-id'] = String(state.sessionId);
+        }
+
+        if (state.user?.empresaId) {
+          headers['x-empresa-id'] = String(state.user.empresaId);
+        }
+
+        if (state.user?.sucursalId) {
+          headers['x-sucursal-id'] = String(state.user.sucursalId);
         }
 
         return {
@@ -2506,6 +2577,59 @@
         });
       }
 
+      function renderBusinessDashboard(empresas, sucursales) {
+        refs.empresaList.innerHTML = '';
+        refs.sucursalTableBody.innerHTML = '';
+        refs.newSucursalEmpresa.innerHTML = '<option value="">Selecciona empresa</option>';
+
+        if (!empresas.length) {
+          const row = document.createElement('article');
+          row.innerHTML = '<span class="admin-badge warn">Sin empresas</span><p class="admin-card-meta">No hay empresas registradas.</p>';
+          refs.empresaList.appendChild(row);
+        }
+
+        empresas.forEach((empresa) => {
+          const option = document.createElement('option');
+          option.value = String(empresa.id);
+          option.textContent = empresa.tradeName;
+          refs.newSucursalEmpresa.appendChild(option);
+
+          const row = document.createElement('article');
+          const sucursalCount = sucursales.filter((sucursal) => Number(sucursal.empresaId) === Number(empresa.id)).length;
+          row.innerHTML = `
+            <div class="admin-card-title">
+              <div>
+                <strong>${empresa.tradeName}</strong>
+                <div class="admin-card-meta">${empresa.legalName}</div>
+              </div>
+              <span class="admin-badge ${empresa.isActive ? 'ok' : 'warn'}">${empresa.isActive ? 'Activa' : 'Inactiva'}</span>
+            </div>
+            <p class="admin-card-meta">RFC/ID: ${empresa.taxId || '-'} | Sucursales: ${sucursalCount}</p>
+            <p class="admin-card-meta">${empresa.phone || 'Sin telefono'} | ${empresa.email || 'Sin correo'}</p>
+          `;
+          refs.empresaList.appendChild(row);
+        });
+
+        if (!sucursales.length) {
+          const row = document.createElement('tr');
+          row.innerHTML = '<td colspan="5">No hay sucursales registradas.</td>';
+          refs.sucursalTableBody.appendChild(row);
+          return;
+        }
+
+        sucursales.forEach((sucursal) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${sucursal.empresaName || sucursal.empresaId}</td>
+            <td>${sucursal.code}</td>
+            <td>${sucursal.name}</td>
+            <td>${sucursal.phone || '-'}</td>
+            <td>${sucursal.isActive ? 'Activa' : 'Inactiva'}</td>
+          `;
+          refs.sucursalTableBody.appendChild(row);
+        });
+      }
+
       function renderPaidAccounts(accounts) {
         refs.paidAccountsTableBody.innerHTML = '';
 
@@ -2829,6 +2953,25 @@
             return;
           }
           setStatus(refs.adminStatus, error.message || 'Error al consultar productos admin.', true);
+        }
+      }
+
+      async function loadBusinessDashboard() {
+        try {
+          const [empresasData, sucursalesData] = await Promise.all([
+            requestJson(`${API_URL}/api/admin/empresas`, { headers: adminHeaders() }),
+            requestJson(`${API_URL}/api/admin/sucursales`, { headers: adminHeaders() }),
+          ]);
+
+          state.empresas = empresasData.empresas || [];
+          state.sucursales = sucursalesData.sucursales || [];
+          renderBusinessDashboard(state.empresas, state.sucursales);
+          setStatus(refs.businessStatus, `${state.empresas.length} empresa(s), ${state.sucursales.length} sucursal(es).`);
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.businessStatus)) {
+            return;
+          }
+          setStatus(refs.businessStatus, error.message || 'Error al cargar empresas y sucursales.', true);
         }
       }
 
@@ -3261,6 +3404,80 @@
           await Promise.all([loadProducts(), loadAdminProducts()]);
         } catch (error) {
           setStatus(refs.adminStatus, 'Error de comunicacion al crear producto.', true);
+        }
+      }
+
+      async function addEmpresa() {
+        const legalName = refs.newEmpresaLegalName.value.trim();
+        const tradeName = refs.newEmpresaTradeName.value.trim();
+
+        if (!legalName || !tradeName) {
+          setStatus(refs.businessStatus, 'Razon social y nombre comercial son requeridos.', true);
+          return;
+        }
+
+        try {
+          await requestJson(`${API_URL}/api/admin/empresas`, {
+            method: 'POST',
+            headers: adminHeaders(),
+            body: JSON.stringify({
+              legalName,
+              tradeName,
+              taxId: refs.newEmpresaTaxId.value.trim(),
+              phone: refs.newEmpresaPhone.value.trim(),
+              email: refs.newEmpresaEmail.value.trim(),
+            }),
+          });
+
+          refs.newEmpresaLegalName.value = '';
+          refs.newEmpresaTradeName.value = '';
+          refs.newEmpresaTaxId.value = '';
+          refs.newEmpresaPhone.value = '';
+          refs.newEmpresaEmail.value = '';
+          setStatus(refs.businessStatus, 'Empresa agregada.');
+          await loadBusinessDashboard();
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.businessStatus)) {
+            return;
+          }
+          setStatus(refs.businessStatus, error.message || 'No fue posible agregar empresa.', true);
+        }
+      }
+
+      async function addSucursal() {
+        const empresaId = Number(refs.newSucursalEmpresa.value || 0);
+        const code = refs.newSucursalCode.value.trim().toUpperCase();
+        const name = refs.newSucursalName.value.trim();
+
+        if (!empresaId || !code || !name) {
+          setStatus(refs.businessStatus, 'Selecciona empresa, codigo y nombre de sucursal.', true);
+          return;
+        }
+
+        try {
+          await requestJson(`${API_URL}/api/admin/sucursales`, {
+            method: 'POST',
+            headers: adminHeaders(),
+            body: JSON.stringify({
+              empresaId,
+              code,
+              name,
+              address: refs.newSucursalAddress.value.trim(),
+              phone: refs.newSucursalPhone.value.trim(),
+            }),
+          });
+
+          refs.newSucursalCode.value = '';
+          refs.newSucursalName.value = '';
+          refs.newSucursalAddress.value = '';
+          refs.newSucursalPhone.value = '';
+          setStatus(refs.businessStatus, 'Sucursal agregada.');
+          await loadBusinessDashboard();
+        } catch (error) {
+          if (handleAdminAuthFailure(error, refs.businessStatus)) {
+            return;
+          }
+          setStatus(refs.businessStatus, error.message || 'No fue posible agregar sucursal.', true);
         }
       }
 
@@ -3796,6 +4013,9 @@
       refs.sessionInfo.textContent = `Sesion activa: ${state.user.name} (${state.user.role})`;
       refs.logoutBtn.addEventListener('click', logout);
       refs.addProductBtn.addEventListener('click', addProduct);
+      refs.addEmpresaBtn.addEventListener('click', addEmpresa);
+      refs.addSucursalBtn.addEventListener('click', addSucursal);
+      refs.refreshBusinessBtn.addEventListener('click', loadBusinessDashboard);
       refs.addInventoryEntryBtn.addEventListener('click', addInventoryEntry);
       refs.runInventoryMovementBtn.addEventListener('click', runInventoryMovement);
       refs.runInventoryTransferBtn.addEventListener('click', runInventoryTransfer);
@@ -3940,6 +4160,7 @@
       if (state.user.role === 'admin') {
         refs.adminPanel.style.display = 'block';
         Promise.all([
+          loadBusinessDashboard(),
           loadAdminProducts(),
           loadEmployees(),
           loadDailySales(),

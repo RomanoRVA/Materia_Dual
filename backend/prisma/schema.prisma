@@ -9,6 +9,8 @@ datasource db {
 
 model Product {
   id        Int      @id @default(autoincrement())
+  empresaId Int?
+  sucursalId Int?
   name      String   @unique
   category  String
   price     Decimal  @db.Decimal(10, 2)
@@ -16,17 +18,23 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  empresa            Empresa?            @relation(fields: [empresaId], references: [id], onDelete: SetNull)
+  sucursal           Sucursal?           @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
   purchaseDetails    DetalleCompra[]     @relation("DetalleCompraProduct")
   inventoryStocks    InventoryStock[]    @relation("InventoryStockProduct")
   inventoryMovements InventoryMovement[] @relation("InventoryMovementProduct")
   inventoryAlerts    InventoryAlert[]    @relation("InventoryAlertProduct")
 
+  @@index([empresaId, isActive])
+  @@index([sucursalId, isActive])
   @@index([isActive])
   @@map("products")
 }
 
 model Employee {
   id         Int      @id @default(autoincrement())
+  empresaId  Int?
+  sucursalId Int?
   username   String   @unique
   accessCode String   @unique
   role       String
@@ -35,6 +43,8 @@ model Employee {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  empresa               Empresa?             @relation(fields: [empresaId], references: [id], onDelete: SetNull)
+  sucursal              Sucursal?            @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
   openedCashBoxes       Caja[]               @relation("CajaOpenedBy")
   closedCashBoxes       Caja[]               @relation("CajaClosedBy")
   cashMovements         MovimientoCaja[]     @relation("MovimientoCajaEmployee")
@@ -51,6 +61,8 @@ model Employee {
   devices               AuthDevice[]
   inventoryMovements    InventoryMovement[]  @relation("InventoryMovementEmployee")
 
+  @@index([empresaId, role, isActive])
+  @@index([sucursalId, role, isActive])
   @@index([role, isActive])
   @@map("employees")
 }
@@ -139,6 +151,8 @@ model PasswordResetToken {
 
 model Sale {
   id             Int      @id @default(autoincrement())
+  empresaId      Int?
+  sucursalId     Int?
   orderId        Int      @unique
   paidDay        String   @db.VarChar(10)
   total          Decimal  @db.Decimal(10, 2)
@@ -151,8 +165,12 @@ model Sale {
   cutReference   String?  @db.VarChar(64)
   createdAt      DateTime @default(now())
 
+  empresa       Empresa?           @relation(fields: [empresaId], references: [id], onDelete: SetNull)
+  sucursal      Sucursal?          @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
   cashMovements MovimientoCaja[] @relation("MovimientoCajaSale")
 
+  @@index([empresaId, paidDay])
+  @@index([sucursalId, paidDay])
   @@index([paidDay])
   @@index([cutReference])
   @@map("sales")
@@ -160,6 +178,8 @@ model Sale {
 
 model TableAccount {
   id              Int      @id @default(autoincrement())
+  empresaId       Int?
+  sucursalId      Int?
   tableNumber     Int      @unique
   guestCount      Int?
   status          String   @default("open") @db.VarChar(16)
@@ -169,8 +189,12 @@ model TableAccount {
   createdAt       DateTime @default(now()) @db.DateTime(0)
   updatedAt       DateTime @default(now()) @updatedAt @db.DateTime(0)
 
+  empresa Empresa? @relation(fields: [empresaId], references: [id], onDelete: SetNull)
+  sucursal Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
   items TableAccountItem[]
 
+  @@index([empresaId, status])
+  @@index([sucursalId, status])
   @@index([status])
   @@map("table_accounts")
 }
@@ -194,6 +218,8 @@ model TableAccountItem {
 
 model DailyCut {
   id                Int      @id @default(autoincrement())
+  empresaId         Int?
+  sucursalId        Int?
   reference         String   @unique @db.VarChar(64)
   cutDate           DateTime @db.Date
   ordersCount       Int      @default(0)
@@ -202,6 +228,11 @@ model DailyCut {
   generatedByUserId Int?
   createdAt         DateTime @default(now()) @db.DateTime(0)
 
+  empresa  Empresa?  @relation(fields: [empresaId], references: [id], onDelete: SetNull)
+  sucursal Sucursal? @relation(fields: [sucursalId], references: [id], onDelete: SetNull)
+
+  @@index([empresaId, cutDate])
+  @@index([sucursalId, cutDate])
   @@map("daily_cuts")
 }
 
@@ -217,6 +248,11 @@ model Empresa {
   updatedAt DateTime @updatedAt
 
   branches            Sucursal[]
+  products            Product[]
+  employees           Employee[]
+  sales               Sale[]
+  tableAccounts       TableAccount[]
+  dailyCuts           DailyCut[]
   suppliers           Proveedor[]
   logEntries          Bitacora[]
   auditEntries        Auditoria[]
@@ -241,6 +277,11 @@ model Sucursal {
 
   empresa             Empresa              @relation(fields: [empresaId], references: [id], onDelete: Restrict)
   cashBoxes           Caja[]
+  products            Product[]
+  employees           Employee[]
+  sales               Sale[]
+  tableAccounts       TableAccount[]
+  dailyCuts           DailyCut[]
   cashMovements       MovimientoCaja[]
   suppliers           Proveedor[]
   purchases           Compra[]

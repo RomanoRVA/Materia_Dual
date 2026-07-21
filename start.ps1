@@ -196,8 +196,12 @@ try {
     # Ignore logging failure.
   }
 } finally {
-  Stop-ProcessTree -ProcessId $backendProc.Id
-  Stop-ProcessTree -ProcessId $frontendProc.Id
+  if ($backendProc) {
+    Stop-ProcessTree -ProcessId $backendProc.Id
+  }
+  if ($frontendProc) {
+    Stop-ProcessTree -ProcessId $frontendProc.Id
+  }
   try {
     Stop-Transcript | Out-Null
   } catch {

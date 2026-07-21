@@ -32,6 +32,7 @@ const defaultPermissions = [
   { code: 'admin.employees.manage', module: 'admin.employees', action: 'manage', name: 'Administrar usuarios' },
   { code: 'admin.sales.read', module: 'admin.sales', action: 'read', name: 'Consultar ventas' },
   { code: 'admin.sales.cutoff', module: 'admin.sales', action: 'cutoff', name: 'Realizar corte' },
+  { code: 'admin.business.manage', module: 'admin.business', action: 'manage', name: 'Administrar empresas y sucursales' },
   { code: 'orders.read', module: 'orders', action: 'read', name: 'Consultar ordenes' },
   { code: 'orders.create', module: 'orders', action: 'create', name: 'Crear ordenes' },
   { code: 'orders.status.update', module: 'orders', action: 'status.update', name: 'Actualizar estado de ordenes' },
@@ -96,6 +97,16 @@ const refreshTokenTtlDays = Number(process.env.REFRESH_TOKEN_TTL_DAYS || 30);
 const loginLockWindowMinutes = Number(process.env.LOGIN_LOCK_WINDOW_MINUTES || 15);
 const loginLockMaxAttempts = Number(process.env.LOGIN_LOCK_MAX_ATTEMPTS || 5);
 const passwordResetTtlMinutes = Number(process.env.PASSWORD_RESET_TTL_MINUTES || 20);
+const defaultEmpresa = {
+  legalName: process.env.DEFAULT_EMPRESA_LEGAL_NAME || 'POS Los Pachecos',
+  tradeName: process.env.DEFAULT_EMPRESA_TRADE_NAME || 'POS Los Pachecos',
+  taxId: process.env.DEFAULT_EMPRESA_TAX_ID || 'DEFAULT',
+};
+const defaultSucursal = {
+  code: process.env.DEFAULT_SUCURSAL_CODE || 'MATRIZ',
+  name: process.env.DEFAULT_SUCURSAL_NAME || 'Matriz',
+};
+let defaultBusinessContext = null;
 
 // Middleware base para recibir JSON en futuras rutas del POS.
 app.use(express.json());
@@ -105,7 +116,7 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-user-id, x-user-role, x-session-id, x-device-id, x-device-name',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization, x-user-id, x-user-role, x-session-id, x-device-id, x-device-name, x-empresa-id, x-sucursal-id',
   );
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
 
@@ -214,6 +225,8 @@ function ensureWaiterCanUseTable(authUser, tableNumber) {
 function toProductResponse(product) {
   return {
     id: product.id,
+    empresaId: product.empresaId === null || product.empresaId === undefined ? null : Number(product.empresaId),
+    sucursalId: product.sucursalId === null || product.sucursalId === undefined ? null : Number(product.sucursalId),
     name: product.name,
     category: product.category,
     price: Number(product.price),
@@ -489,8 +502,8 @@ async function applyInventoryEntry({ productId, quantity, unitCost, locationKey 
   return getInventoryStock(stock.id);
 }
 
-async function applyInventoryOutput({ productId, quantity, locationKey = 'global', referenceType = null, referenceId = null, reason = 'salida', notes = null, authUser = null, movementType = 'salida' }) {
-  const stock = await getOrCreateInventoryStock(productId, locationKey);
+async function applyInventoryOutput({ productId, quantity, locationKey = 'global', sucursalId = null, referenceType = null, referenceId = null, reason = 'salida', notes = null, authUser = null, movementType = 'salida' }) {
+  const stock = await getOrCreateInventoryStock(productId, locationKey, sucursalId);
   if (!stock) {
     return null;
   }
@@ -527,8 +540,8 @@ async function applyInventoryOutput({ productId, quantity, locationKey = 'global
   return getInventoryStock(stock.id);
 }
 
-async function applyInventoryAdjustment({ productId, newQuantity, locationKey = 'global', reason = 'ajuste', notes = null, authUser = null }) {
-  const stock = await getOrCreateInventoryStock(productId, locationKey);
+async function applyInventoryAdjustment({ productId, newQuantity, locationKey = 'global', sucursalId = null, reason = 'ajuste', notes = null, authUser = null }) {
+  const stock = await getOrCreateInventoryStock(productId, locationKey, sucursalId);
   if (!stock) {
     return null;
   }
@@ -565,10 +578,10 @@ async function applyInventoryAdjustment({ productId, newQuantity, locationKey = 
   return getInventoryStock(stock.id);
 }
 
-async function applyInventoryTransfer({ productId, quantity, fromLocationKey = 'global', toLocationKey, reason = 'transferencia', notes = null, authUser = null }) {
+async function applyInventoryTransfer({ productId, quantity, fromLocationKey = 'global', toLocationKey, sucursalId = null, reason = 'transferencia', notes = null, authUser = null }) {
   const normalizedQuantity = Number(quantity);
-  const fromStock = await getOrCreateInventoryStock(productId, fromLocationKey);
-  const toStock = await getOrCreateInventoryStock(productId, toLocationKey);
+  const fromStock = await getOrCreateInventoryStock(productId, fromLocationKey, sucursalId);
+  const toStock = await getOrCreateInventoryStock(productId, toLocationKey, sucursalId);
 
   if (!fromStock || !toStock) {
     return null;
@@ -631,6 +644,7 @@ async function applyInventorySaleMovements(order, authUser) {
       productId,
       quantity,
       locationKey: 'global',
+      sucursalId: Number(authUser?.sucursalId || 0) || null,
       referenceType: 'sale',
       referenceId: String(order.id),
       reason: 'venta',
@@ -644,6 +658,8 @@ async function applyInventorySaleMovements(order, authUser) {
 function normalizeEmployeeResponse(employee) {
   return {
     id: employee.id,
+    empresaId: employee.empresaId === null || employee.empresaId === undefined ? null : Number(employee.empresaId),
+    sucursalId: employee.sucursalId === null || employee.sucursalId === undefined ? null : Number(employee.sucursalId),
     username: employee.username,
     role: employee.role,
     name: employee.name,
@@ -695,6 +711,132 @@ function normalizeDevicePayload(req) {
   return {
     deviceId: rawDeviceId || `local-${crypto.randomBytes(12).toString('hex')}`,
     deviceName: rawDeviceName.slice(0, 160) || 'Dispositivo POS',
+  };
+}
+
+async function tableColumnExists(tableName, columnName) {
+  const rows = await prisma.$queryRawUnsafe(
+    `
+    SELECT 1
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = ?
+      AND COLUMN_NAME = ?
+    LIMIT 1
+    `,
+    tableName,
+    columnName,
+  );
+  return rows.length > 0;
+}
+
+async function tableExists(tableName) {
+  const rows = await prisma.$queryRawUnsafe(
+    `
+    SELECT 1
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = ?
+    LIMIT 1
+    `,
+    tableName,
+  );
+  return rows.length > 0;
+}
+
+async function ensureColumn(tableName, columnName, columnDefinition) {
+  if (!(await tableExists(tableName))) {
+    return false;
+  }
+
+  if (await tableColumnExists(tableName, columnName)) {
+    return true;
+  }
+
+  await prisma.$executeRawUnsafe(`ALTER TABLE \`${tableName}\` ADD COLUMN ${columnDefinition}`);
+  return true;
+}
+
+async function ensureIndex(tableName, indexName, indexDefinition) {
+  if (!(await tableExists(tableName))) {
+    return;
+  }
+
+  const rows = await prisma.$queryRawUnsafe(
+    `
+    SELECT 1
+    FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = ?
+      AND INDEX_NAME = ?
+    LIMIT 1
+    `,
+    tableName,
+    indexName,
+  );
+  if (rows.length) {
+    return;
+  }
+
+  await prisma.$executeRawUnsafe(`ALTER TABLE \`${tableName}\` ADD ${indexDefinition}`);
+}
+
+async function getDefaultBusinessContext() {
+  if (defaultBusinessContext) {
+    return defaultBusinessContext;
+  }
+
+  const empresaRows = await prisma.$queryRawUnsafe(
+    'SELECT id, legalName, tradeName FROM empresas WHERE taxId = ? LIMIT 1',
+    defaultEmpresa.taxId,
+  );
+  const empresaId = Number(empresaRows[0]?.id || 0);
+
+  if (!empresaId) {
+    throw new Error('No se encontro la empresa por defecto.');
+  }
+
+  const sucursalRows = await prisma.$queryRawUnsafe(
+    'SELECT id, code, name FROM sucursales WHERE empresaId = ? AND code = ? LIMIT 1',
+    empresaId,
+    defaultSucursal.code,
+  );
+  const sucursalId = Number(sucursalRows[0]?.id || 0);
+
+  if (!sucursalId) {
+    throw new Error('No se encontro la sucursal por defecto.');
+  }
+
+  defaultBusinessContext = {
+    empresaId,
+    sucursalId,
+    empresaName: empresaRows[0].tradeName || empresaRows[0].legalName,
+    sucursalName: sucursalRows[0].name,
+  };
+  return defaultBusinessContext;
+}
+
+function parseTenantHeader(value) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+async function getRequestBusinessContext(req) {
+  const fallback = await getDefaultBusinessContext();
+  return {
+    empresaId: parseTenantHeader(req.headers['x-empresa-id']) || Number(req.authUser?.empresaId || 0) || fallback.empresaId,
+    sucursalId: parseTenantHeader(req.headers['x-sucursal-id']) || Number(req.authUser?.sucursalId || 0) || fallback.sucursalId,
+  };
+}
+
+function scopedProductWhere(context, includeInactive = false) {
+  return {
+    ...(includeInactive ? {} : { isActive: true }),
+    OR: [
+      { empresaId: null, sucursalId: null },
+      { empresaId: context.empresaId, sucursalId: null },
+      { empresaId: context.empresaId, sucursalId: context.sucursalId },
+    ],
   };
 }
 
@@ -817,6 +959,8 @@ async function validateAccessSession(req) {
       s.status,
       s.expiresAt,
       e.id,
+      e.empresaId,
+      e.sucursalId,
       e.username,
       e.role,
       e.name,
@@ -954,6 +1098,119 @@ async function ensureDefaultEmployees() {
       employee.name,
     );
   }
+}
+
+async function ensureMultiCompanySchema() {
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS empresas (
+      id INT NOT NULL AUTO_INCREMENT,
+      legalName VARCHAR(160) NOT NULL,
+      tradeName VARCHAR(160) NOT NULL,
+      taxId VARCHAR(32) NULL,
+      phone VARCHAR(32) NULL,
+      email VARCHAR(120) NULL,
+      isActive TINYINT(1) NOT NULL DEFAULT 1,
+      createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      KEY idx_empresas_isActive (isActive),
+      KEY idx_empresas_taxId (taxId)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS sucursales (
+      id INT NOT NULL AUTO_INCREMENT,
+      empresaId INT NOT NULL,
+      code VARCHAR(32) NOT NULL,
+      name VARCHAR(120) NOT NULL,
+      address VARCHAR(255) NULL,
+      phone VARCHAR(32) NULL,
+      isActive TINYINT(1) NOT NULL DEFAULT 1,
+      createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      UNIQUE KEY uniq_sucursales_empresa_code (empresaId, code),
+      KEY idx_sucursales_empresa_active (empresaId, isActive),
+      CONSTRAINT fk_sucursales_empresa FOREIGN KEY (empresaId) REFERENCES empresas(id) ON DELETE RESTRICT
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `);
+
+  await prisma.$executeRawUnsafe(
+    `
+    INSERT INTO empresas (legalName, tradeName, taxId, isActive, createdAt, updatedAt)
+    SELECT ?, ?, ?, 1, NOW(), NOW()
+    WHERE NOT EXISTS (SELECT 1 FROM empresas WHERE taxId = ?)
+    `,
+    defaultEmpresa.legalName,
+    defaultEmpresa.tradeName,
+    defaultEmpresa.taxId,
+    defaultEmpresa.taxId,
+  );
+
+  const empresaRows = await prisma.$queryRawUnsafe('SELECT id FROM empresas WHERE taxId = ? LIMIT 1', defaultEmpresa.taxId);
+  const empresaId = Number(empresaRows[0]?.id || 0);
+  if (!empresaId) {
+    throw new Error('No fue posible preparar empresa por defecto.');
+  }
+
+  await prisma.$executeRawUnsafe(
+    `
+    INSERT INTO sucursales (empresaId, code, name, isActive, createdAt, updatedAt)
+    SELECT ?, ?, ?, 1, NOW(), NOW()
+    WHERE NOT EXISTS (SELECT 1 FROM sucursales WHERE empresaId = ? AND code = ?)
+    `,
+    empresaId,
+    defaultSucursal.code,
+    defaultSucursal.name,
+    empresaId,
+    defaultSucursal.code,
+  );
+
+  const sucursalRows = await prisma.$queryRawUnsafe(
+    'SELECT id FROM sucursales WHERE empresaId = ? AND code = ? LIMIT 1',
+    empresaId,
+    defaultSucursal.code,
+  );
+  const sucursalId = Number(sucursalRows[0]?.id || 0);
+  if (!sucursalId) {
+    throw new Error('No fue posible preparar sucursal por defecto.');
+  }
+
+  const tenantTables = [
+    { table: 'products', empresaIndex: 'idx_products_empresa_active', sucursalIndex: 'idx_products_sucursal_active' },
+    { table: 'employees', empresaIndex: 'idx_employees_empresa_role_active', sucursalIndex: 'idx_employees_sucursal_role_active' },
+    { table: 'sales', empresaIndex: 'idx_sales_empresa_paidDay', sucursalIndex: 'idx_sales_sucursal_paidDay' },
+    { table: 'table_accounts', empresaIndex: 'idx_table_accounts_empresa_status', sucursalIndex: 'idx_table_accounts_sucursal_status' },
+    { table: 'daily_cuts', empresaIndex: 'idx_daily_cuts_empresa_cutDate', sucursalIndex: 'idx_daily_cuts_sucursal_cutDate' },
+  ];
+
+  for (const item of tenantTables) {
+    if (!(await tableExists(item.table))) {
+      continue;
+    }
+
+    await ensureColumn(item.table, 'empresaId', 'empresaId INT NULL');
+    await ensureColumn(item.table, 'sucursalId', 'sucursalId INT NULL');
+    await ensureIndex(item.table, item.empresaIndex, `KEY ${item.empresaIndex} (empresaId)`);
+    await ensureIndex(item.table, item.sucursalIndex, `KEY ${item.sucursalIndex} (sucursalId)`);
+    await prisma.$executeRawUnsafe(
+      `UPDATE \`${item.table}\` SET empresaId = ?, sucursalId = ? WHERE empresaId IS NULL OR sucursalId IS NULL`,
+      empresaId,
+      sucursalId,
+    );
+  }
+
+  if (await tableColumnExists('inventory_stock', 'sucursalId')) {
+    await prisma.$executeRawUnsafe('UPDATE inventory_stock SET sucursalId = ? WHERE sucursalId IS NULL', sucursalId);
+  }
+
+  defaultBusinessContext = {
+    empresaId,
+    sucursalId,
+    empresaName: defaultEmpresa.tradeName,
+    sucursalName: defaultSucursal.name,
+  };
 }
 
 async function ensureTableAccountsSchema() {
@@ -1399,10 +1656,12 @@ async function initializeOrderSequenceFromSales() {
   }
 }
 
-async function getTableAccountByNumber(tableNumber) {
+async function getTableAccountByNumber(tableNumber, context = null) {
+  const scope = context || (await getDefaultBusinessContext());
   const accountRows = await prisma.$queryRawUnsafe(
-    'SELECT id, tableNumber, guestCount, status, updatedBy, updatedByUserId, lastOrderId, createdAt, updatedAt FROM table_accounts WHERE tableNumber = ? LIMIT 1',
+    'SELECT id, empresaId, sucursalId, tableNumber, guestCount, status, updatedBy, updatedByUserId, lastOrderId, createdAt, updatedAt FROM table_accounts WHERE tableNumber = ? AND (sucursalId IS NULL OR sucursalId = ?) LIMIT 1',
     tableNumber,
+    scope.sucursalId,
   );
   const account = accountRows[0];
 
@@ -1417,6 +1676,8 @@ async function getTableAccountByNumber(tableNumber) {
 
   return {
     id: account.id,
+    empresaId: account.empresaId === null ? null : Number(account.empresaId),
+    sucursalId: account.sucursalId === null ? null : Number(account.sucursalId),
     tableNumber: Number(account.tableNumber),
     guestCount: account.guestCount === null ? null : Number(account.guestCount),
     updatedBy: account.updatedBy || null,
@@ -1436,9 +1697,11 @@ async function getTableAccountByNumber(tableNumber) {
   };
 }
 
-async function getOpenTableAccounts() {
+async function getOpenTableAccounts(context = null) {
+  const scope = context || (await getDefaultBusinessContext());
   const accounts = await prisma.$queryRawUnsafe(
-    "SELECT id, tableNumber, guestCount, status, updatedBy, updatedByUserId, lastOrderId, createdAt, updatedAt FROM table_accounts WHERE status = 'open' ORDER BY tableNumber ASC",
+    "SELECT id, empresaId, sucursalId, tableNumber, guestCount, status, updatedBy, updatedByUserId, lastOrderId, createdAt, updatedAt FROM table_accounts WHERE status = 'open' AND (sucursalId IS NULL OR sucursalId = ?) ORDER BY tableNumber ASC",
+    scope.sucursalId,
   );
 
   if (!accounts.length) {
@@ -1471,6 +1734,8 @@ async function getOpenTableAccounts() {
 
   return accounts.map((account) => ({
     id: Number(account.id),
+    empresaId: account.empresaId === null ? null : Number(account.empresaId),
+    sucursalId: account.sucursalId === null ? null : Number(account.sucursalId),
     tableNumber: Number(account.tableNumber),
     guestCount: account.guestCount === null ? null : Number(account.guestCount),
     updatedBy: account.updatedBy || null,
@@ -1483,7 +1748,8 @@ async function getOpenTableAccounts() {
 }
 
 async function closeTableAccountByNumber(tableNumber, authUser) {
-  const rows = await prisma.$queryRawUnsafe('SELECT id FROM table_accounts WHERE tableNumber = ? LIMIT 1', tableNumber);
+  const context = await getDefaultBusinessContext();
+  const rows = await prisma.$queryRawUnsafe('SELECT id FROM table_accounts WHERE tableNumber = ? AND (sucursalId IS NULL OR sucursalId = ?) LIMIT 1', tableNumber, Number(authUser?.sucursalId || 0) || context.sucursalId);
   const accountId = Number(rows[0]?.id || 0);
 
   if (!accountId) {
@@ -1503,6 +1769,8 @@ async function closeTableAccountByNumber(tableNumber, authUser) {
 
 function buildOrderFromTableAccount(account, authUser, paymentInput) {
   const paidAt = new Date().toISOString();
+  const empresaId = Number(authUser?.empresaId || account.empresaId || 0) || null;
+  const sucursalId = Number(authUser?.sucursalId || account.sucursalId || 0) || null;
   const items = account.items.map((item) => ({
     productId: Number(item.productId),
     productName: item.productName,
@@ -1516,6 +1784,8 @@ function buildOrderFromTableAccount(account, authUser, paymentInput) {
 
   const order = {
     id: orderSequence,
+    empresaId,
+    sucursalId,
     status: 'pagada',
     createdBy: authUser?.username || account.updatedBy || 'sistema-local',
     createdByUserId: Number(authUser?.id || account.updatedByUserId || 0) || null,
@@ -1552,9 +1822,11 @@ async function persistPaidSale(order) {
   const paidDay = String(order.payment.paidAt).slice(0, 10);
   await prisma.$executeRawUnsafe(
     `
-    INSERT INTO sales (orderId, paidDay, total, paymentMethod, amountReceived, \`change\`, createdByUser, itemCount, paidAt, cutReference, createdAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NOW())
+    INSERT INTO sales (empresaId, sucursalId, orderId, paidDay, total, paymentMethod, amountReceived, \`change\`, createdByUser, itemCount, paidAt, cutReference, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NOW())
     ON DUPLICATE KEY UPDATE
+      empresaId = VALUES(empresaId),
+      sucursalId = VALUES(sucursalId),
       paidDay = VALUES(paidDay),
       total = VALUES(total),
       paymentMethod = VALUES(paymentMethod),
@@ -1565,6 +1837,8 @@ async function persistPaidSale(order) {
       paidAt = VALUES(paidAt),
       cutReference = NULL
     `,
+    Number(order.empresaId || 0) || null,
+    Number(order.sucursalId || 0) || null,
     order.id,
     paidDay,
     Number(order.total),
@@ -1691,7 +1965,7 @@ async function validateLegacyRequestUser(req, allowedRoles) {
   }
 
   const rows = await prisma.$queryRawUnsafe(
-    'SELECT id, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE id = ? LIMIT 1',
+    'SELECT id, empresaId, sucursalId, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE id = ? LIMIT 1',
     user.id,
   );
   const dbUser = rows[0];
@@ -1762,6 +2036,7 @@ const requireProductManage = requirePermission('admin.products.manage', ['admin'
 const requireEmployeeManage = requirePermission('admin.employees.manage', ['admin']);
 const requireSalesRead = requirePermission('admin.sales.read', ['admin']);
 const requireSalesCutoff = requirePermission('admin.sales.cutoff', ['admin']);
+const requireBusinessManage = requirePermission('admin.business.manage', ['admin']);
 const requireOrderRead = requirePermission('orders.read', ['admin', 'cashier', 'waiter', 'kitchen']);
 const requireOrderCreate = requirePermission('orders.create', ['waiter', 'cashier', 'admin']);
 const requireOrderStatusUpdate = requirePermission('orders.status.update', ['waiter', 'cashier', 'admin', 'kitchen']);
@@ -1984,7 +2259,7 @@ app.post('/api/auth/login', async (req, res) => {
   let user;
   try {
     const rows = await prisma.$queryRawUnsafe(
-      'SELECT id, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE accessCode = ? AND isActive = 1 LIMIT 1',
+      'SELECT id, empresaId, sucursalId, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE accessCode = ? AND isActive = 1 LIMIT 1',
       normalizedCode,
     );
     user = rows[0];
@@ -2048,6 +2323,8 @@ app.post('/api/auth/refresh', async (req, res) => {
         s.status,
         s.refreshExpiresAt,
         e.id,
+        e.empresaId,
+        e.sucursalId,
         e.username,
         e.role,
         e.name,
@@ -2540,12 +2817,174 @@ app.post('/api/security/employees/:id/permissions', requireAdmin, async (req, re
   }
 });
 
+app.get('/api/business/context', requireRoles(['admin', 'cashier', 'waiter', 'kitchen']), async (req, res) => {
+  try {
+    const context = await getRequestBusinessContext(req);
+    const rows = await prisma.$queryRawUnsafe(
+      `
+      SELECT
+        e.id AS empresaId,
+        e.legalName,
+        e.tradeName,
+        s.id AS sucursalId,
+        s.code AS sucursalCode,
+        s.name AS sucursalName
+      FROM empresas e
+      INNER JOIN sucursales s ON s.empresaId = e.id
+      WHERE e.id = ? AND s.id = ?
+      LIMIT 1
+      `,
+      context.empresaId,
+      context.sucursalId,
+    );
+    const row = rows[0];
+
+    return res.status(200).json({
+      context: row
+        ? {
+            empresaId: Number(row.empresaId),
+            empresaName: row.tradeName || row.legalName,
+            legalName: row.legalName,
+            sucursalId: Number(row.sucursalId),
+            sucursalCode: row.sucursalCode,
+            sucursalName: row.sucursalName,
+          }
+        : context,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'No fue posible consultar contexto de negocio.', detail: error.message });
+  }
+});
+
+app.get('/api/admin/empresas', requireBusinessManage, async (req, res) => {
+  try {
+    const rows = await prisma.$queryRawUnsafe(
+      'SELECT id, legalName, tradeName, taxId, phone, email, isActive, createdAt, updatedAt FROM empresas ORDER BY isActive DESC, tradeName ASC',
+    );
+    return res.status(200).json({
+      empresas: rows.map((item) => ({
+        id: Number(item.id),
+        legalName: item.legalName,
+        tradeName: item.tradeName,
+        taxId: item.taxId || null,
+        phone: item.phone || null,
+        email: item.email || null,
+        isActive: Boolean(item.isActive),
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      })),
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'No fue posible consultar empresas.', detail: error.message });
+  }
+});
+
+app.post('/api/admin/empresas', requireBusinessManage, async (req, res) => {
+  const legalName = String(req.body.legalName || '').trim();
+  const tradeName = String(req.body.tradeName || legalName).trim();
+  const taxId = String(req.body.taxId || '').trim() || null;
+  const phone = String(req.body.phone || '').trim() || null;
+  const email = String(req.body.email || '').trim() || null;
+
+  if (!legalName || !tradeName) {
+    return res.status(400).json({ message: 'legalName y tradeName son requeridos.' });
+  }
+
+  try {
+    await prisma.$executeRawUnsafe(
+      `
+      INSERT INTO empresas (legalName, tradeName, taxId, phone, email, isActive, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())
+      `,
+      legalName,
+      tradeName,
+      taxId,
+      phone,
+      email,
+    );
+    const rows = await prisma.$queryRawUnsafe('SELECT id, legalName, tradeName, taxId, phone, email, isActive, createdAt, updatedAt FROM empresas WHERE id = LAST_INSERT_ID()');
+    return res.status(201).json({ empresa: rows[0] });
+  } catch (error) {
+    return res.status(500).json({ message: 'No fue posible crear empresa.', detail: error.message });
+  }
+});
+
+app.get('/api/admin/sucursales', requireBusinessManage, async (req, res) => {
+  const empresaId = parseTenantHeader(req.query.empresaId) || null;
+
+  try {
+    const rows = await prisma.$queryRawUnsafe(
+      `
+      SELECT s.id, s.empresaId, e.tradeName AS empresaName, s.code, s.name, s.address, s.phone, s.isActive, s.createdAt, s.updatedAt
+      FROM sucursales s
+      INNER JOIN empresas e ON e.id = s.empresaId
+      WHERE (? IS NULL OR s.empresaId = ?)
+      ORDER BY e.tradeName ASC, s.name ASC
+      `,
+      empresaId,
+      empresaId,
+    );
+    return res.status(200).json({
+      sucursales: rows.map((item) => ({
+        id: Number(item.id),
+        empresaId: Number(item.empresaId),
+        empresaName: item.empresaName,
+        code: item.code,
+        name: item.name,
+        address: item.address || null,
+        phone: item.phone || null,
+        isActive: Boolean(item.isActive),
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      })),
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'No fue posible consultar sucursales.', detail: error.message });
+  }
+});
+
+app.post('/api/admin/sucursales', requireBusinessManage, async (req, res) => {
+  const empresaId = Number(req.body.empresaId);
+  const code = String(req.body.code || '').trim().toUpperCase();
+  const name = String(req.body.name || '').trim();
+  const address = String(req.body.address || '').trim() || null;
+  const phone = String(req.body.phone || '').trim() || null;
+
+  if (!Number.isInteger(empresaId) || empresaId <= 0 || !code || !name) {
+    return res.status(400).json({ message: 'empresaId, code y name son requeridos.' });
+  }
+
+  try {
+    await prisma.$executeRawUnsafe(
+      `
+      INSERT INTO sucursales (empresaId, code, name, address, phone, isActive, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, 1, NOW(), NOW())
+      `,
+      empresaId,
+      code,
+      name,
+      address,
+      phone,
+    );
+    const rows = await prisma.$queryRawUnsafe(
+      'SELECT id, empresaId, code, name, address, phone, isActive, createdAt, updatedAt FROM sucursales WHERE id = LAST_INSERT_ID()',
+    );
+    return res.status(201).json({ sucursal: rows[0] });
+  } catch (error) {
+    if (error.message?.includes('Duplicate')) {
+      return res.status(409).json({ message: 'Ya existe una sucursal con ese codigo para la empresa.' });
+    }
+    return res.status(500).json({ message: 'No fue posible crear sucursal.', detail: error.message });
+  }
+});
+
 app.get('/api/catalog/products', async (req, res) => {
   const { includeInactive } = req.query;
 
   try {
+    const context = await getRequestBusinessContext(req);
     const products = await prisma.product.findMany({
-      where: includeInactive === 'true' ? {} : { isActive: true },
+      where: scopedProductWhere(context, includeInactive === 'true'),
       orderBy: [{ category: 'asc' }, { name: 'asc' }],
     });
 
@@ -2557,7 +2996,9 @@ app.get('/api/catalog/products', async (req, res) => {
 
 app.get('/api/admin/products', requireProductManage, async (req, res) => {
   try {
+    const context = await getRequestBusinessContext(req);
     const products = await prisma.product.findMany({
+      where: scopedProductWhere(context, true),
       orderBy: [{ isActive: 'desc' }, { category: 'asc' }, { name: 'asc' }],
     });
 
@@ -2578,8 +3019,11 @@ app.post('/api/admin/products', requireProductManage, async (req, res) => {
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
     const product = await prisma.product.create({
       data: {
+        empresaId: context.empresaId,
+        sucursalId: context.sucursalId,
         name: normalizedName,
         category: normalizedCategory,
         price: normalizedPrice,
@@ -2643,6 +3087,16 @@ app.patch('/api/admin/products/:id', requireProductManage, async (req, res) => {
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
+    const existing = await prisma.product.findUnique({ where: { id: productId } });
+    if (!existing) {
+      return res.status(404).json({ message: 'Producto no encontrado.' });
+    }
+
+    if (existing.empresaId !== null && Number(existing.empresaId) !== Number(context.empresaId)) {
+      return res.status(403).json({ message: 'Producto fuera de la empresa activa.' });
+    }
+
     const product = await prisma.product.update({
       where: { id: productId },
       data,
@@ -2670,6 +3124,16 @@ app.delete('/api/admin/products/:id', requireProductManage, async (req, res) => 
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
+    const existing = await prisma.product.findUnique({ where: { id: productId } });
+    if (!existing) {
+      return res.status(404).json({ message: 'Producto no encontrado.' });
+    }
+
+    if (existing.empresaId !== null && Number(existing.empresaId) !== Number(context.empresaId)) {
+      return res.status(403).json({ message: 'Producto fuera de la empresa activa.' });
+    }
+
     const product = await prisma.product.delete({
       where: { id: productId },
     });
@@ -2684,14 +3148,22 @@ app.delete('/api/admin/products/:id', requireProductManage, async (req, res) => 
   }
 });
 
-app.get('/api/orders', requireOrderRead, (req, res) => {
-  const sorted = [...orders].sort((a, b) => Number(b.id) - Number(a.id));
+app.get('/api/orders', requireOrderRead, async (req, res) => {
+  const context = await getRequestBusinessContext(req);
+  const sorted = orders
+    .filter((order) => {
+      const empresaId = Number(order.empresaId || context.empresaId);
+      const sucursalId = Number(order.sucursalId || context.sucursalId);
+      return empresaId === Number(context.empresaId) && sucursalId === Number(context.sucursalId);
+    })
+    .sort((a, b) => Number(b.id) - Number(a.id));
   res.status(200).json({ orders: sorted });
 });
 
 app.get('/api/table-accounts/open', requireTableRead, async (req, res) => {
   try {
-    const accounts = await getOpenTableAccounts();
+    const context = await getRequestBusinessContext(req);
+    const accounts = await getOpenTableAccounts(context);
     return res.status(200).json({ accounts });
   } catch (error) {
     return res.status(500).json({ message: 'No fue posible consultar cuentas de mesa.', detail: error.message });
@@ -2705,7 +3177,8 @@ app.get('/api/table-accounts/:tableNumber', requireTableRead, async (req, res) =
   }
 
   try {
-    const account = await getTableAccountByNumber(tableNumber);
+    const context = await getRequestBusinessContext(req);
+    const account = await getTableAccountByNumber(tableNumber, context);
     return res.status(200).json({ account });
   } catch (error) {
     return res.status(500).json({ message: 'No fue posible consultar cuenta de mesa.', detail: error.message });
@@ -2752,6 +3225,7 @@ app.put('/api/table-accounts/:tableNumber', requireTableManage, async (req, res)
     );
 
   try {
+    const context = await getRequestBusinessContext(req);
     if (req.authUser.role === 'waiter') {
       const tableAccess = ensureWaiterCanUseTable(req.authUser, tableNumber);
       if (!tableAccess.ok) {
@@ -2761,9 +3235,11 @@ app.put('/api/table-accounts/:tableNumber', requireTableManage, async (req, res)
 
     await prisma.$executeRawUnsafe(
       `
-      INSERT INTO table_accounts (tableNumber, guestCount, status, updatedBy, updatedByUserId, lastOrderId, createdAt, updatedAt)
-      VALUES (?, ?, 'open', ?, ?, ?, NOW(), NOW())
+      INSERT INTO table_accounts (empresaId, sucursalId, tableNumber, guestCount, status, updatedBy, updatedByUserId, lastOrderId, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, 'open', ?, ?, ?, NOW(), NOW())
       ON DUPLICATE KEY UPDATE
+        empresaId = VALUES(empresaId),
+        sucursalId = VALUES(sucursalId),
         guestCount = VALUES(guestCount),
         status = 'open',
         updatedBy = VALUES(updatedBy),
@@ -2771,6 +3247,8 @@ app.put('/api/table-accounts/:tableNumber', requireTableManage, async (req, res)
         lastOrderId = VALUES(lastOrderId),
         updatedAt = NOW()
       `,
+      context.empresaId,
+      context.sucursalId,
       tableNumber,
       guestCount,
       req.authUser.username,
@@ -2805,7 +3283,7 @@ app.put('/api/table-accounts/:tableNumber', requireTableManage, async (req, res)
       );
     }
 
-    const account = await getTableAccountByNumber(tableNumber);
+    const account = await getTableAccountByNumber(tableNumber, context);
     return res.status(200).json({ account });
   } catch (error) {
     return res.status(500).json({ message: 'No fue posible guardar cuenta de mesa.', detail: error.message });
@@ -2819,7 +3297,8 @@ app.delete('/api/table-accounts/:tableNumber', requireTableClose, async (req, re
   }
 
   try {
-    const rows = await prisma.$queryRawUnsafe('SELECT id FROM table_accounts WHERE tableNumber = ? LIMIT 1', tableNumber);
+    const context = await getRequestBusinessContext(req);
+    const rows = await prisma.$queryRawUnsafe('SELECT id FROM table_accounts WHERE tableNumber = ? AND (sucursalId IS NULL OR sucursalId = ?) LIMIT 1', tableNumber, context.sucursalId);
     const accountId = Number(rows[0]?.id || 0);
 
     if (!accountId) {
@@ -2853,7 +3332,8 @@ app.post('/api/table-accounts/:tableNumber/pay', requireOrderPay, async (req, re
   }
 
   try {
-    const account = await getTableAccountByNumber(tableNumber);
+    const context = await getRequestBusinessContext(req);
+    const account = await getTableAccountByNumber(tableNumber, context);
     if (!account || !account.items?.length) {
       return res.status(404).json({ message: 'No hay cuenta abierta con productos para esta mesa.' });
     }
@@ -2891,11 +3371,13 @@ app.post('/api/orders', requireOrderCreate, async (req, res) => {
   }
 
   let productsInDb;
+  let orderContext;
   try {
+    orderContext = await getRequestBusinessContext(req);
     productsInDb = await prisma.product.findMany({
       where: {
+        ...scopedProductWhere(orderContext, false),
         id: { in: requestedProductIds },
-        isActive: true,
       },
     });
   } catch (error) {
@@ -2957,6 +3439,8 @@ app.post('/api/orders', requireOrderCreate, async (req, res) => {
   const createdAt = new Date().toISOString();
   const order = {
     id: orderSequence,
+    empresaId: orderContext.empresaId,
+    sucursalId: orderContext.sucursalId,
     status: 'creada',
     createdBy: req.authUser?.username || createdBy || 'sistema-local',
     createdByUserId: Number(req.authUser?.id) || null,
@@ -3108,15 +3592,18 @@ app.get('/api/inventory/stocks', requireInventoryRead, async (req, res) => {
   const onlyAlerts = String(req.query.onlyAlerts || '').toLowerCase() === 'true';
 
   try {
+    const context = await getRequestBusinessContext(req);
     const rows = await prisma.$queryRawUnsafe(
       `
       SELECT *
       FROM inventory_stock
       WHERE isActive = 1
+        AND (sucursalId IS NULL OR sucursalId = ?)
         AND (? IS NULL OR locationKey = ?)
         AND (? = 0 OR (minStock > 0 AND quantity <= minStock))
       ORDER BY productName ASC, locationKey ASC
       `,
+      context.sucursalId,
       locationKey,
       locationKey,
       onlyAlerts ? 1 : 0,
@@ -3134,19 +3621,30 @@ app.get('/api/inventory/movements', requireInventoryRead, async (req, res) => {
   const limit = Math.min(Math.max(Number(req.query.limit || 100), 1), 500);
 
   try {
+    const context = await getRequestBusinessContext(req);
     const rows = await prisma.$queryRawUnsafe(
       `
-      SELECT *
-      FROM inventory_movements
-      WHERE (? IS NULL OR productId = ?)
+      SELECT im.*
+      FROM inventory_movements im
+      LEFT JOIN inventory_stock fs ON fs.id = im.fromStockId
+      LEFT JOIN inventory_stock ts ON ts.id = im.toStockId
+      WHERE (? IS NULL OR im.productId = ?)
         AND (? IS NULL OR type = ?)
-      ORDER BY createdAt DESC, id DESC
+        AND (
+          fs.sucursalId IS NULL
+          OR fs.sucursalId = ?
+          OR ts.sucursalId IS NULL
+          OR ts.sucursalId = ?
+        )
+      ORDER BY im.createdAt DESC, im.id DESC
       LIMIT ?
       `,
       productId,
       productId,
       type,
       type,
+      context.sucursalId,
+      context.sucursalId,
       limit,
     );
 
@@ -3160,15 +3658,19 @@ app.get('/api/inventory/alerts', requireInventoryAlertsRead, async (req, res) =>
   const status = String(req.query.status || 'open').trim().toLowerCase();
 
   try {
+    const context = await getRequestBusinessContext(req);
     const rows = await prisma.$queryRawUnsafe(
       `
-      SELECT *
-      FROM inventory_alerts
-      WHERE (? = 'all' OR status = ?)
-      ORDER BY createdAt DESC, id DESC
+      SELECT ia.*
+      FROM inventory_alerts ia
+      INNER JOIN inventory_stock s ON s.id = ia.stockId
+      WHERE (? = 'all' OR ia.status = ?)
+        AND (s.sucursalId IS NULL OR s.sucursalId = ?)
+      ORDER BY ia.createdAt DESC, ia.id DESC
       `,
       status,
       status,
+      context.sucursalId,
     );
 
     return res.status(200).json({ alerts: rows.map(toInventoryAlertResponse) });
@@ -3188,12 +3690,13 @@ app.post('/api/inventory/entries', requireInventoryMovementCreate, async (req, r
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
     const stock = await applyInventoryEntry({
       productId,
       quantity,
       unitCost,
       locationKey: req.body.locationKey,
-      sucursalId: req.body.sucursalId ? Number(req.body.sucursalId) : null,
+      sucursalId: req.body.sucursalId ? Number(req.body.sucursalId) : context.sucursalId,
       minStock: Number.isFinite(minStock) && minStock >= 0 ? minStock : null,
       referenceType: req.body.referenceType ? String(req.body.referenceType).slice(0, 40) : null,
       referenceId: req.body.referenceId ? String(req.body.referenceId).slice(0, 80) : null,
@@ -3221,10 +3724,12 @@ app.post('/api/inventory/outputs', requireInventoryMovementCreate, async (req, r
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
     const stock = await applyInventoryOutput({
       productId,
       quantity,
       locationKey: req.body.locationKey,
+      sucursalId: context.sucursalId,
       referenceType: req.body.referenceType ? String(req.body.referenceType).slice(0, 40) : null,
       referenceId: req.body.referenceId ? String(req.body.referenceId).slice(0, 80) : null,
       reason: String(req.body.reason || 'salida').slice(0, 160),
@@ -3252,10 +3757,12 @@ app.post('/api/inventory/waste', requireInventoryAdjust, async (req, res) => {
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
     const stock = await applyInventoryOutput({
       productId,
       quantity,
       locationKey: req.body.locationKey,
+      sucursalId: context.sucursalId,
       reason: String(req.body.reason || 'merma').slice(0, 160),
       notes: req.body.notes ? String(req.body.notes).slice(0, 255) : null,
       authUser: req.authUser,
@@ -3281,10 +3788,12 @@ app.post('/api/inventory/adjustments', requireInventoryAdjust, async (req, res) 
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
     const stock = await applyInventoryAdjustment({
       productId,
       newQuantity: Number(newQuantity.toFixed(3)),
       locationKey: req.body.locationKey,
+      sucursalId: context.sucursalId,
       reason: String(req.body.reason || 'ajuste').slice(0, 160),
       notes: req.body.notes ? String(req.body.notes).slice(0, 255) : null,
       authUser: req.authUser,
@@ -3311,11 +3820,13 @@ app.post('/api/inventory/transfers', requireInventoryTransfer, async (req, res) 
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
     const result = await applyInventoryTransfer({
       productId,
       quantity,
       fromLocationKey,
       toLocationKey,
+      sucursalId: context.sucursalId,
       reason: String(req.body.reason || 'transferencia').slice(0, 160),
       notes: req.body.notes ? String(req.body.notes).slice(0, 255) : null,
       authUser: req.authUser,
@@ -3361,13 +3872,25 @@ app.patch('/api/inventory/stocks/:id/min-stock', requireInventoryAdjust, async (
   }
 });
 
-app.get('/api/admin/employees', requireEmployeeManage, (req, res) => {
-  return prisma
-    .$queryRawUnsafe(
-      "SELECT id, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE role <> 'admin' AND isActive = 1 ORDER BY role ASC, name ASC",
-    )
-    .then((employees) => res.status(200).json({ employees: employees.map(normalizeEmployeeResponse) }))
-    .catch((error) => res.status(500).json({ message: 'No fue posible consultar empleados.', detail: error.message }));
+app.get('/api/admin/employees', requireEmployeeManage, async (req, res) => {
+  try {
+    const context = await getRequestBusinessContext(req);
+    const employees = await prisma.$queryRawUnsafe(
+      `
+      SELECT id, empresaId, sucursalId, username, role, name, accessCode, isActive, createdAt, updatedAt
+      FROM employees
+      WHERE role <> 'admin'
+        AND isActive = 1
+        AND (empresaId IS NULL OR empresaId = ?)
+      ORDER BY role ASC, name ASC
+      `,
+      context.empresaId,
+    );
+
+    return res.status(200).json({ employees: employees.map(normalizeEmployeeResponse) });
+  } catch (error) {
+    return res.status(500).json({ message: 'No fue posible consultar empleados.', detail: error.message });
+  }
 });
 
 app.post('/api/admin/employees', requireEmployeeManage, async (req, res) => {
@@ -3385,6 +3908,7 @@ app.post('/api/admin/employees', requireEmployeeManage, async (req, res) => {
   }
 
   try {
+    const context = await getRequestBusinessContext(req);
     const existing = await prisma.$queryRawUnsafe(
       'SELECT id FROM employees WHERE username = ? OR accessCode = ? LIMIT 1',
       username,
@@ -3396,7 +3920,9 @@ app.post('/api/admin/employees', requireEmployeeManage, async (req, res) => {
     }
 
     await prisma.$executeRawUnsafe(
-      'INSERT INTO employees (username, accessCode, role, name, isActive, createdAt, updatedAt) VALUES (?, ?, ?, ?, 1, NOW(), NOW())',
+      'INSERT INTO employees (empresaId, sucursalId, username, accessCode, role, name, isActive, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, 1, NOW(), NOW())',
+      context.empresaId,
+      context.sucursalId,
       username,
       accessCode,
       role,
@@ -3404,7 +3930,7 @@ app.post('/api/admin/employees', requireEmployeeManage, async (req, res) => {
     );
 
     const rows = await prisma.$queryRawUnsafe(
-      'SELECT id, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE username = ? LIMIT 1',
+      'SELECT id, empresaId, sucursalId, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE username = ? LIMIT 1',
       username,
     );
 
@@ -3424,7 +3950,7 @@ app.delete('/api/admin/employees/:id', requireEmployeeManage, async (req, res) =
 
   try {
     const rows = await prisma.$queryRawUnsafe(
-      'SELECT id, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE id = ? LIMIT 1',
+      'SELECT id, empresaId, sucursalId, username, role, name, accessCode, isActive, createdAt, updatedAt FROM employees WHERE id = ? LIMIT 1',
       employeeId,
     );
     const employee = rows[0];
@@ -3450,6 +3976,7 @@ app.delete('/api/admin/employees/:id', requireEmployeeManage, async (req, res) =
 
 app.get('/api/admin/sales/paid-accounts', requireSalesRead, async (req, res) => {
   try {
+    const context = await getRequestBusinessContext(req);
     const rows = await prisma.$queryRawUnsafe(
       `
       SELECT
@@ -3465,8 +3992,12 @@ app.get('/api/admin/sales/paid-accounts', requireSalesRead, async (req, res) => 
         cutReference,
         CONCAT('REF-', LPAD(orderId, 6, '0')) AS reference
       FROM sales
+      WHERE (empresaId IS NULL OR empresaId = ?)
+        AND (sucursalId IS NULL OR sucursalId = ?)
       ORDER BY paidAt DESC, orderId DESC
       `,
+      context.empresaId,
+      context.sucursalId,
     );
 
     const accounts = rows.map((item) => ({
@@ -3491,8 +4022,10 @@ app.get('/api/admin/sales/paid-accounts', requireSalesRead, async (req, res) => 
 
 app.post('/api/admin/sales/cutoff', requireSalesCutoff, async (req, res) => {
   try {
+    const context = await getRequestBusinessContext(req);
     const openAccountsRows = await prisma.$queryRawUnsafe(
-      "SELECT COUNT(*) AS total FROM table_accounts WHERE status = 'open'",
+      "SELECT COUNT(*) AS total FROM table_accounts WHERE status = 'open' AND (sucursalId IS NULL OR sucursalId = ?)",
+      context.sucursalId,
     );
     const openAccounts = Number(openAccountsRows[0]?.total || 0);
 
@@ -3501,7 +4034,9 @@ app.post('/api/admin/sales/cutoff', requireSalesCutoff, async (req, res) => {
     }
 
     const totalsRows = await prisma.$queryRawUnsafe(
-      'SELECT COUNT(*) AS paidOrders, COALESCE(SUM(total), 0) AS revenue FROM sales WHERE cutReference IS NULL',
+      'SELECT COUNT(*) AS paidOrders, COALESCE(SUM(total), 0) AS revenue FROM sales WHERE cutReference IS NULL AND (empresaId IS NULL OR empresaId = ?) AND (sucursalId IS NULL OR sucursalId = ?)',
+      context.empresaId,
+      context.sucursalId,
     );
 
     const paidOrders = Number(totalsRows[0]?.paidOrders || 0);
@@ -3517,9 +4052,11 @@ app.post('/api/admin/sales/cutoff', requireSalesCutoff, async (req, res) => {
 
     await prisma.$executeRawUnsafe(
       `
-      INSERT INTO daily_cuts (reference, cutDate, ordersCount, revenue, generatedBy, generatedByUserId, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, NOW())
+      INSERT INTO daily_cuts (empresaId, sucursalId, reference, cutDate, ordersCount, revenue, generatedBy, generatedByUserId, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
       `,
+      context.empresaId,
+      context.sucursalId,
       reference,
       cutDate,
       paidOrders,
@@ -3529,8 +4066,10 @@ app.post('/api/admin/sales/cutoff', requireSalesCutoff, async (req, res) => {
     );
 
     await prisma.$executeRawUnsafe(
-      'UPDATE sales SET cutReference = ? WHERE cutReference IS NULL',
+      'UPDATE sales SET cutReference = ? WHERE cutReference IS NULL AND (empresaId IS NULL OR empresaId = ?) AND (sucursalId IS NULL OR sucursalId = ?)',
       reference,
+      context.empresaId,
+      context.sucursalId,
     );
 
     return res.status(200).json({
@@ -3549,12 +4088,17 @@ app.post('/api/admin/sales/cutoff', requireSalesCutoff, async (req, res) => {
 
 app.get('/api/admin/sales/daily', requireSalesRead, async (req, res) => {
   try {
+    const context = await getRequestBusinessContext(req);
     const grouped = await prisma.$queryRawUnsafe(
-      'SELECT paidDay, COUNT(*) AS ordersCount, SUM(total) AS revenue FROM sales WHERE cutReference IS NULL GROUP BY paidDay ORDER BY paidDay DESC',
+      'SELECT paidDay, COUNT(*) AS ordersCount, SUM(total) AS revenue FROM sales WHERE cutReference IS NULL AND (empresaId IS NULL OR empresaId = ?) AND (sucursalId IS NULL OR sucursalId = ?) GROUP BY paidDay ORDER BY paidDay DESC',
+      context.empresaId,
+      context.sucursalId,
     );
 
     const totalsRows = await prisma.$queryRawUnsafe(
-      'SELECT COUNT(*) AS paidOrders, COALESCE(SUM(total), 0) AS revenue FROM sales WHERE cutReference IS NULL',
+      'SELECT COUNT(*) AS paidOrders, COALESCE(SUM(total), 0) AS revenue FROM sales WHERE cutReference IS NULL AND (empresaId IS NULL OR empresaId = ?) AND (sucursalId IS NULL OR sucursalId = ?)',
+      context.empresaId,
+      context.sucursalId,
     );
 
     const summary = grouped.map((item) => {
@@ -3623,13 +4167,15 @@ async function startServer() {
 
   try {
     await prisma.$connect();
-    await ensureDefaultEmployees();
     await ensureTableAccountsSchema();
     await ensureDailyCutsSchema();
     await ensureSalesCutReferenceColumn();
+    await ensureMultiCompanySchema();
+    await ensureDefaultEmployees();
     await ensureAuthSchema();
     await ensureAuthorizationSchema();
     await ensureInventorySchema();
+    await ensureMultiCompanySchema();
     await seedAuthorizationCatalog();
     await initializeOrderSequenceFromSales();
     console.log('[db] Conexion a base de datos lista.');
