@@ -1,153 +1,187 @@
 # POS Los Pachecos
 
-Sistema de Punto de Venta (POS) para la taqueria **Los Pachecos**, disenado para automatizar el flujo de toma y procesamiento de ordenes, reducir tiempos de atencion y habilitar instrumentacion cientifica de datos para medir rendimiento operativo.
+Sistema de punto de venta para administrar la operación diaria de la taquería **Los Pachecos**. La aplicación concentra en una sola interfaz la toma de pedidos, el control de mesas, el envío de comandas a cocina, los cobros, el inventario y la administración del negocio.
 
-## Objetivo de Semana 4 (Onboarding y esqueleto inicial)
+## ¿Qué hace el programa?
 
-- Definir estructura base del proyecto.
-- Levantar un backend minimo funcional.
-- Publicar una pantalla inicial de frontend.
-- Establecer base para trazabilidad de eventos y tiempos de procesamiento.
+El flujo principal comienza cuando un empleado inicia sesión con su código de acceso. Según su rol y permisos, puede:
 
-## Avance actual (Semana 5 - base funcional)
+- Consultar el catálogo de productos por categoría y capturar pedidos.
+- Abrir mesas, registrar el número de comensales y agregar productos con cantidades y notas.
+- Enviar comandas a cocina y actualizar su estado durante la preparación.
+- Imprimir comandas de cocina y tickets para el cliente en impresoras configuradas.
+- Cobrar órdenes en efectivo u otros métodos, calcular el cambio y cerrar la cuenta.
+- Consultar las ventas del día y generar cortes de caja.
+- Registrar entradas, salidas, mermas, ajustes y transferencias de inventario.
+- Definir existencias mínimas y consultar alertas de productos con bajo inventario.
+- Crear, editar o desactivar productos y empleados.
+- Administrar empresas, sucursales, roles y permisos granulares.
+- Consultar y revocar sesiones activas de los usuarios.
+- Registrar telemetría de las órdenes para analizar tiempos y eventos de operación.
 
-- Autenticacion inicial por usuario y PIN en backend.
-- Catalogo visual consumido desde API.
-- Creacion de ordenes con calculo de total.
-- Envio de orden a cocina y actualizacion de estados.
-- Registro de eventos de telemetria y resumen de metricas.
+La interfaz se adapta al perfil de **administrador**, **cajero**, **mesero** o **cocina**, mostrando únicamente las funciones que corresponden a cada usuario.
 
-## Avance actual (Semana 6 - productos en base de datos)
+## Flujo de una venta
 
-- Catalogo de productos persistente en MySQL (Amazon RDS) con Prisma.
-- Seed inicial con productos y precios de ejemplo.
-- Endpoints admin para crear, actualizar y desactivar productos.
-- Frontend con panel admin para alta de productos y gestion basica.
+1. El empleado inicia sesión con su código de acceso.
+2. Selecciona o abre una mesa.
+3. Agrega productos del catálogo y, si es necesario, notas para cocina.
+4. Envía la orden a cocina.
+5. Cocina actualiza el estado del pedido hasta marcarlo como listo.
+6. Caja registra el método de pago, calcula el cambio e imprime el ticket.
+7. La venta queda disponible para los reportes y el corte diario.
 
-## Stack Tecnologico (Base propuesta)
+## Módulos principales
 
-- **Frontend:** HTML5, CSS3 y JavaScript Vanilla
-- **Backend:** Node.js con Express
-- **Base de Datos:** MySQL (Amazon RDS)
+| Módulo | Función |
+| --- | --- |
+| Autenticación | Inicio de sesión por código, renovación y cierre de sesión, bloqueo por intentos fallidos y recuperación de acceso. |
+| Pedidos y mesas | Apertura de mesas, captura de productos, notas, seguimiento de estados y cierre de cuentas. |
+| Caja y ventas | Cobro de órdenes, cálculo de cambio, consulta de ventas y cortes diarios. |
+| Productos | Catálogo, precios, categorías y activación o desactivación de productos. |
+| Inventario | Existencias, costos, movimientos, mermas, ajustes, transferencias y alertas de stock mínimo. |
+| Administración | Empleados, empresas, sucursales, roles y permisos por módulo. |
+| Impresión | Comandas para cocina y tickets para clientes mediante impresoras de red configurables. |
+| Telemetría | Registro de eventos y resumen de tiempos del procesamiento de órdenes. |
 
-> Nota: esta base puede migrarse despues a React/FastAPI/MySQL sin perder la estructura general.
+## Tecnologías
 
-## Estructura de carpetas
+- **Frontend:** HTML5, CSS3 y JavaScript sin frameworks.
+- **Backend:** Node.js y Express.
+- **Base de datos:** MySQL con Prisma ORM; preparado para Amazon RDS.
+- **Escritorio:** Electron y un iniciador para Windows.
+
+## Estructura del proyecto
 
 ```text
 pos-los-pachecos/
-|-- backend/
-|-- frontend/
-|-- database/
-`-- docs/
+├── backend/
+│   ├── prisma/           # Esquema y datos iniciales
+│   ├── scripts/          # Utilidades de mantenimiento
+│   └── src/server.js     # API y lógica del sistema
+├── desktop/              # Aplicación de escritorio con Electron
+├── docs/                 # Documentación técnica y de arquitectura
+├── frontend/             # Login e interfaz del POS
+├── launch-pos.bat        # Inicio rápido en Windows
+├── start.ps1             # Inicia backend, frontend y ventana de la aplicación
+└── stop.ps1              # Detiene los servicios locales
 ```
 
-## Backlog Inicial (Historias de Usuario Criticas)
+## Requisitos
 
-### HU-01 Autenticacion de personal
-**Como** cajero o administrador,
-**quiero** iniciar sesion con credenciales,
-**para** acceder de forma segura a las funciones permitidas segun mi rol.
+- Windows 10 u 11 para usar los scripts de inicio incluidos.
+- Node.js LTS y npm.
+- Python 3, utilizado por `start.ps1` para servir el frontend.
+- Una instancia de MySQL accesible, local o en Amazon RDS.
 
-**Criterios de aceptacion**
-- Validacion de usuario y contrasena.
-- Respuesta de error clara ante credenciales invalidas.
-- Registro de intento de inicio de sesion en logs.
+## Configuración inicial
 
-### HU-02 Catalogo visual para ordenar
-**Como** cajero,
-**quiero** ver un catalogo visual de productos (tacos, bebidas, extras),
-**para** capturar ordenes rapidamente y con menos errores.
+1. Instala las dependencias del backend:
 
-**Criterios de aceptacion**
-- Visualizacion por categorias.
-- Agregar/quitar productos de una orden.
-- Calculo automatico de subtotal y total.
+   ```powershell
+   cd backend
+   npm install
+   ```
 
-### HU-03 Transmision digital a cocina
-**Como** personal de cocina,
-**quiero** recibir la orden de forma digital en tiempo real,
-**para** comenzar preparacion sin depender de tickets en papel.
+2. Crea el archivo de configuración:
 
-**Criterios de aceptacion**
-- Al confirmar una orden en caja, se marca como "enviada a cocina".
-- Cocina visualiza el detalle (productos, cantidad, notas).
-- Cambio de estado de la orden (recibida, en preparacion, lista).
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-### HU-04 Modulo de telemetria y logs de ordenes
-**Como** equipo de operaciones,
-**quiero** capturar eventos y tiempos de cada orden,
-**para** medir el tiempo total de procesamiento y detectar cuellos de botella.
+3. Edita `backend/.env` y coloca la conexión real a MySQL:
 
-**Criterios de aceptacion**
-- Registrar marcas de tiempo por etapa: creacion, envio a cocina, lista, entrega.
-- Guardar logs estructurados por `orderId`, `eventType`, `timestamp`.
-- Exponer endpoint base para health check y base para metricas futuras.
+   ```env
+   DATABASE_URL="mysql://USUARIO:CONTRASEÑA@SERVIDOR:3306/pos_los_pachecos?sslaccept=strict"
+   ```
 
-## Primeros pasos locales
+4. Prepara la base de datos:
 
-Prerequisito: tener instalado Node.js LTS (incluye npm).
+   ```powershell
+   npm run prisma:generate
+   npm run prisma:push
+   npm run prisma:seed
+   ```
 
-### Backend
+La guía específica para Amazon RDS está en [`docs/rds-mysql-setup.md`](docs/rds-mysql-setup.md).
 
-```bash
+## Ejecutar el programa
+
+Desde la carpeta raíz del proyecto, ejecuta:
+
+```powershell
+.\start.ps1
+```
+
+También puedes abrir `launch-pos.bat`. El iniciador:
+
+- levanta la API en `http://localhost:3000`;
+- sirve el frontend en `http://localhost:5500`;
+- abre el POS como una ventana de aplicación en Edge o Chrome;
+- detiene ambos servicios cuando se cierra la ventana.
+
+Para detener manualmente los servicios:
+
+```powershell
+.\stop.ps1
+```
+
+### Ejecución manual
+
+Backend:
+
+```powershell
 cd backend
-cp .env.example .env
-# Ajusta DATABASE_URL con tu endpoint y credenciales de Amazon RDS MySQL
-npm install
-npm run prisma:generate
-npm run prisma:push
-npm run prisma:seed
 npm run dev
 ```
 
-Servidor esperado en: `http://localhost:3000`
+Frontend, en otra terminal:
 
-### Frontend
+```powershell
+cd frontend
+python -m http.server 5500
+```
 
-Abre `frontend/index.html` en navegador para visualizar la aplicacion base.
+Después abre `http://localhost:5500`.
 
-## Credenciales demo
+## Usuarios iniciales
 
-- Usuario: `cajero1` | PIN: `1234`
-- Usuario: `admin1` | PIN: `4321`
+El backend crea usuarios de arranque si todavía no existen:
 
-## Endpoints disponibles (base)
+| Rol | Usuario | Código de acceso |
+| --- | --- | --- |
+| Administrador | `admin1` | `200640` |
+| Cajero | `cajero1` | `100540` |
 
-- `GET /health`
-- `POST /api/auth/login`
-- `GET /api/catalog/products`
-- `GET /api/admin/products`
-- `POST /api/admin/products`
-- `PATCH /api/admin/products/:id`
-- `DELETE /api/admin/products/:id`
-- `GET /api/orders`
-- `POST /api/orders`
-- `POST /api/orders/:id/send-kitchen`
-- `PATCH /api/orders/:id/status`
-- `GET /api/telemetry/events`
-- `GET /api/telemetry/summary`
+> Estos códigos son únicamente para configuración o demostración. Deben cambiarse antes de usar el sistema en producción.
 
-## Conexion a Amazon RDS MySQL
+## Configuración opcional
 
-- Guia detallada: `docs/rds-mysql-setup.md`
-- Variable principal: `DATABASE_URL` en `backend/.env`
-- Ejemplo de cadena:
-	`mysql://admin:TU_PASSWORD@TU_ENDPOINT_RDS:3306/pos_los_pachecos?sslaccept=strict`
+Además de `DATABASE_URL`, el backend admite variables para:
 
-## Persistencia de logs de telemetria
+- puerto del servidor;
+- duración de sesiones y tokens de renovación;
+- límite de intentos fallidos de acceso;
+- contexto inicial de empresa y sucursal;
+- activación de impresión;
+- impresoras de cocina y caja.
 
-- Archivo persistente: `backend/logs/telemetry-events.jsonl`
-- Formato: JSON Lines (1 evento por linea)
-- Comportamiento: al iniciar el backend, se cargan eventos historicos del archivo.
-- Nota: estos logs son para analitica y auditoria ligera en entorno local.
+Consulta el código de configuración en `backend/src/server.js` y la documentación técnica de `docs/` para conocer la arquitectura de autenticación, inventario, permisos y operación multiempresa.
 
-## Convenciones sugeridas para el equipo
+## Persistencia
 
-- Usar ramas por funcionalidad: `feature/<nombre-corto>`.
-- Commits pequenos y descriptivos.
-- Documentar decisiones tecnicas en `docs/`.
+MySQL almacena productos, empleados, sesiones, permisos, empresas, sucursales, ventas, cortes e inventario. La telemetría también se escribe como JSON Lines en:
+
+```text
+backend/logs/telemetry-events.jsonl
+```
+
+Las órdenes operativas activas se mantienen en memoria durante la ejecución del backend; al cobrar, la venta queda registrada en la base de datos.
+
+## Estado del proyecto
+
+El proyecto es una implementación académica y funcional orientada a la operación de una taquería. Antes de desplegarlo en producción se recomienda reforzar la seguridad de credenciales, restringir CORS, configurar respaldos de MySQL, usar HTTPS y validar las impresoras y la red del establecimiento.
 
 ## Licencia
 
-Proyecto academico para fines educativos.
+Proyecto académico para fines educativos.
